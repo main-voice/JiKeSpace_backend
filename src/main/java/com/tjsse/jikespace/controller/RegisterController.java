@@ -1,4 +1,4 @@
-package com.tjsse.jikespace.controller.user;
+package com.tjsse.jikespace.controller;
 
 import com.tjsse.jikespace.entity.dto.UserDTO;
 import com.tjsse.jikespace.service.RegisterService;
