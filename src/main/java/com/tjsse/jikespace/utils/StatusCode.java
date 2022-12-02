@@ -15,7 +15,12 @@ public enum StatusCode {
     NO_PERMISSION(70001,"无访问权限"),
     SESSION_TIME_OUT(90001,"会话超时"),
     NO_LOGIN(90002,"未登录"),
-    OTHER_ERROR(-1, "总之就是出错");
+    OTHER_ERROR(-1, "总之就是出错"),
+
+    // user status
+    LOG_IN(20, "已登录"),
+    LOG_OUT(30, "已登出"),
+    BANNED(40, "已封禁");
 
     private Integer code;
     private String msg;

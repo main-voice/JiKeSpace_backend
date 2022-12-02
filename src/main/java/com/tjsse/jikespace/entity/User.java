@@ -29,7 +29,7 @@ public class User {
 
     private String username;
 
-    private String adminId;
+    private String isModerator;
 
     private String studentId;
 
@@ -45,7 +45,7 @@ public class User {
 
     private LocalDateTime lastLoginTime;
 
-    private String mobilePhoneNumber;
+    private String phoneNumber;
 
     private String nickname;
 

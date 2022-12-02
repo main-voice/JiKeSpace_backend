@@ -37,7 +37,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
-        String token = request.getHeader("Authorization");
+//        String token = request.getHeader("Authorization");
+        String token = request.getHeader("JK-Token");
 
         if (!StringUtils.hasText(token) || !token.startsWith("Bearer ")) {
             filterChain.doFilter(request, response); // 直接拒绝请求

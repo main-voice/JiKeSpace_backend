@@ -1,5 +1,7 @@
 package com.tjsse.jikespace.service;
 
+import com.tjsse.jikespace.utils.Result;
+
 /**
  * @program: JiKeSpace
  * @description: 登录相关逻辑
@@ -10,5 +12,7 @@ package com.tjsse.jikespace.service;
 public interface LoginService {
     public String createTokenByUsername(String username, String password);
     public String createTokenByEmail(String email, String password);
+
+    public Result logout(Integer userId);
 
 }
