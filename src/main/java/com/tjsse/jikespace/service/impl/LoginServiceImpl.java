@@ -3,7 +3,9 @@ package com.tjsse.jikespace.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.tjsse.jikespace.auth_user.AppUser;
+import com.tjsse.jikespace.entity.Admin;
 import com.tjsse.jikespace.entity.User;
+import com.tjsse.jikespace.mapper.AdminMapper;
 import com.tjsse.jikespace.mapper.UserMapper;
 import com.tjsse.jikespace.service.LoginService;
 import com.tjsse.jikespace.utils.JwtUtil;
@@ -34,32 +36,39 @@ public class LoginServiceImpl implements LoginService {
     UserMapper userMapper;
 
     @Autowired
+    AdminMapper adminMapper;
+
+    // 删除此代码后无法运行，虽然提示没有用到，但是由于自动注入，配置类会用到，不可删@！！！！
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Override
-    public String createTokenByUsername(String username, String password) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(username, password);
+    public Result createTokenByAdminName(String adminName, String password) {
+        QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("admin_name", adminName);
+        Admin admin = adminMapper.selectOne(queryWrapper);
+        if (admin == null) {
+            return Result.fail(ACCOUNT_NOT_EXIST.getCode(), ACCOUNT_EXIST.getMsg(), null);
+        }
 
-        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        String jwt = JwtUtil.createJWT(admin.getId().toString(), "admin");
 
-        AppUser appUser = (AppUser) authenticate.getPrincipal();
-        User user = appUser.getUser();
-
-        String jwt = JwtUtil.createJWT(user.getId().toString());
-
-        return jwt;
+        if(jwt == null) {
+            return Result.fail(OTHER_ERROR.getCode(), "token 生成失败", null);
+        }
+        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), jwt);
     }
 
     @Override
-    public String createTokenByEmail(String email, String password) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(email, password);
+    public Result createTokenByEmail(String email, String password) {
 
-        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("email", email);
+        User user = userMapper.selectOne(queryWrapper);
 
-        AppUser appUser = (AppUser) authenticate.getPrincipal();
-        User user = appUser.getUser();
+        if (user == null) {
+            return Result.fail(ACCOUNT_NOT_EXIST.getCode(), ACCOUNT_EXIST.getMsg(), null);
+        }
 
         // 修改用户登录信息
         LocalDateTime lastLoginTime = LocalDateTime.now();
@@ -70,9 +79,12 @@ public class LoginServiceImpl implements LoginService {
                 .set("status", LOG_IN.getCode());
         userMapper.update(null, userUpdateWrapper);
 
-        String jwt = JwtUtil.createJWT(user.getId().toString());
+        String jwt = JwtUtil.createJWT(user.getId().toString(), "user");
 
-        return jwt;
+        if(jwt == null) {
+            return Result.fail(OTHER_ERROR.getCode(), "token 生成失败", null);
+        }
+        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), jwt);
     }
 
     @Override

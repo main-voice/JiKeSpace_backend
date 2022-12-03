@@ -8,7 +8,6 @@ import com.tjsse.jikespace.mapper.PostMapper;
 import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.service.TagService;
 import com.tjsse.jikespace.service.UserService;
-import javafx.geometry.Pos;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

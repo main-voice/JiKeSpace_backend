@@ -30,8 +30,7 @@ public class LoginController {
         String username = userDTO.getUsername();
         String password = userDTO.getPassword();
         String email = userDTO.getEmail();
-        return Result.success(loginService.createTokenByEmail(email, password));
-//        return Result.success(loginService.createTokenByUsername(username, password));
+        return loginService.createTokenByEmail(email, password);
     }
 
     @PostMapping("logout/")
