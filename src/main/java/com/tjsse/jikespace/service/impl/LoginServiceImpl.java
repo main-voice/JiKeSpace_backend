@@ -2,15 +2,17 @@ package com.tjsse.jikespace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.tjsse.jikespace.entity.Admin;
+import com.tjsse.jikespace.auth_user.AppUser;
 import com.tjsse.jikespace.entity.User;
-import com.tjsse.jikespace.mapper.AdminMapper;
 import com.tjsse.jikespace.mapper.UserMapper;
 import com.tjsse.jikespace.service.LoginService;
 import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
+import com.tjsse.jikespace.utils.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,44 +34,33 @@ public class LoginServiceImpl implements LoginService {
     UserMapper userMapper;
 
     @Autowired
-    AdminMapper adminMapper;
-
-    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Override
-    public Result createTokenByAdminName(String adminName, String password) {
-        QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("admin_name", adminName);
-        Admin admin = adminMapper.selectOne(queryWrapper);
-        if (admin == null) {
-            return Result.fail(ACCOUNT_NOT_EXIST.getCode(), ACCOUNT_EXIST.getMsg(), null);
-        }
+    public String createTokenByUsername(String username, String password) {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(username, password);
 
-        String jwt = JwtUtil.createJWT(admin.getId().toString(), "admin");
+        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-        if(jwt == null) {
-            return Result.fail(OTHER_ERROR.getCode(), "token 生成失败", null);
-        }
-        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), jwt);
+        AppUser appUser = (AppUser) authenticate.getPrincipal();
+        User user = appUser.getUser();
+
+        String jwt = JwtUtil.createJWT(user.getId().toString());
+
+        return jwt;
     }
 
     @Override
-    public Result createTokenByEmail(String email, String password) {
-//        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-//                new UsernamePasswordAuthenticationToken(email, password);
-//
-//        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-//
-//        AppUser appUser = (AppUser) authenticate.getPrincipal();
-//        User user = appUser.getUser();
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("email", email);
-        User user = userMapper.selectOne(queryWrapper);
+    public String createTokenByEmail(String email, String password) {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(email, password);
 
-        if (user == null) {
-            return Result.fail(ACCOUNT_NOT_EXIST.getCode(), ACCOUNT_EXIST.getMsg(), null);
-        }
+        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+        AppUser appUser = (AppUser) authenticate.getPrincipal();
+        User user = appUser.getUser();
+
         // 修改用户登录信息
         LocalDateTime lastLoginTime = LocalDateTime.now();
 
@@ -79,12 +70,9 @@ public class LoginServiceImpl implements LoginService {
                 .set("status", LOG_IN.getCode());
         userMapper.update(null, userUpdateWrapper);
 
-        String jwt = JwtUtil.createJWT(user.getId().toString(), "user");
+        String jwt = JwtUtil.createJWT(user.getId().toString());
 
-        if(jwt == null) {
-            return Result.fail(OTHER_ERROR.getCode(), "token 生成失败", null);
-        }
-        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), jwt);
+        return jwt;
     }
 
     @Override

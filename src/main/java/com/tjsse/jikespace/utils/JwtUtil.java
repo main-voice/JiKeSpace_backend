@@ -13,7 +13,9 @@ import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtil {
@@ -26,12 +28,12 @@ public class JwtUtil {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    public static String createJWT(String subject, String role) {
-        JwtBuilder builder = getJwtBuilder(subject, role, null, getUUID());
+    public static String createJWT(String subject) {
+        JwtBuilder builder = getJwtBuilder(subject, null, getUUID());
         return builder.compact();
     }
 
-    private static JwtBuilder getJwtBuilder(String subject, String role, Long ttlMillis, String uuid) {
+    private static JwtBuilder getJwtBuilder(String subject, Long ttlMillis, String uuid) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         SecretKey secretKey = generalKey();
         long nowMillis = System.currentTimeMillis();
@@ -42,18 +44,12 @@ public class JwtUtil {
 
         long expMillis = nowMillis + ttlMillis;
         Date expDate = new Date(expMillis);
-        // self-define jwt body
-        Map<String, Object> map = new HashMap<>();
-        map.put("role", role);
-        map.put("subject", subject);
-
         return Jwts.builder()
                 .setId(uuid)
                 .setSubject(subject)
-                .setClaims(map)
                 .setIssuer("sg")
-                .signWith(secretKey, signatureAlgorithm)
                 .setIssuedAt(now)
+                .signWith(secretKey)
                 .setExpiration(expDate);
     }
 
@@ -71,7 +67,7 @@ public class JwtUtil {
                 .getBody();
     }
 
-    public static Integer getUserIdFromToken(String JK_Token) {
+    public static String getUserIdFromToken(String JK_Token) {
 
         if (!StringUtils.hasText(JK_Token) || !JK_Token.startsWith("Bearer ")) {
             return null;
@@ -82,29 +78,10 @@ public class JwtUtil {
         String userId;
         try {
             Claims claims = JwtUtil.parseJWT(JK_Token);
-            Map<String, Object> map = new HashMap<>(claims);
-            userId = map.get("subject").toString();
+            userId = claims.getSubject();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return Integer.parseInt(userId);
-    }
-
-    public static String getUserRoleFromToken(String JK_Token) {
-        if (!StringUtils.hasText(JK_Token) || !JK_Token.startsWith("Bearer ")) {
-            return null;
-        }
-
-        JK_Token = JK_Token.substring(7);
-
-        String role;
-        try {
-            Claims claims = JwtUtil.parseJWT(JK_Token);
-            Map<String, Object> map = new HashMap<>(claims);
-            role = map.get("role").toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return role;
+        return userId;
     }
 }

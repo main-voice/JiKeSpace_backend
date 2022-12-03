@@ -9,7 +9,7 @@ package com.tjsse.jikespace.utils;
 public enum StatusCode {
     SUCCESS(20000, "请求成功"),
     PARAMS_ERROR(10001,"参数有误"),
-    ACCOUNT_NOT_EXIST(10002,"用户名或密码不存在"),
+    ACCOUNT_PWD_NOT_EXIST(10002,"用户名或密码不存在"),
     TOKEN_ERROR(10003,"token不合法"),
     ACCOUNT_EXIST(10004,"账号已存在"),
     NO_PERMISSION(70001,"无访问权限"),

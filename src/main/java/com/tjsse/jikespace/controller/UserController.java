@@ -1,11 +1,9 @@
 package com.tjsse.jikespace.controller;
 
 import com.tjsse.jikespace.service.UserService;
-import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,13 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user/")
 public class UserController {
     @Autowired
-    private UserService userService;
+    private UserService userInfoService;
 
     @GetMapping("info/")
-    public Result getUserInfo(@RequestHeader("JK-Token") String jk_token) {
-        Integer userId = JwtUtil.getUserIdFromToken(jk_token);
+    public Result getUserInfo() {
         Result result = new Result();
-        result = userService.getUserInfo(userId);
+        result = userInfoService.getUserInfo();
         return result;
     }
 

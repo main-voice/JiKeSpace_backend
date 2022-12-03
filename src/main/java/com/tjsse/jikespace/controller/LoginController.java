@@ -27,17 +27,20 @@ public class LoginController {
 
     @PostMapping("login/")
     public Result login(@RequestBody UserDTO userDTO) {
+        String username = userDTO.getUsername();
         String password = userDTO.getPassword();
         String email = userDTO.getEmail();
-        return loginService.createTokenByEmail(email, password);
+        return Result.success(loginService.createTokenByEmail(email, password));
+//        return Result.success(loginService.createTokenByUsername(username, password));
     }
 
     @PostMapping("logout/")
     public Result logout(@RequestHeader("JK-Token") String jk_token) {
-        Integer userId = JwtUtil.getUserIdFromToken(jk_token);
-        if (userId == null) {
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
             return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
+        Integer userId = Integer.parseInt(userIdStr);
         return loginService.logout(userId);
     }
 }

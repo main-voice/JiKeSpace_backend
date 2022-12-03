@@ -1,5 +1,6 @@
 package com.tjsse.jikespace.service;
 
+import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.utils.Result;
 
 /**
@@ -10,5 +11,8 @@ import com.tjsse.jikespace.utils.Result;
  * @date: 2022-12-02 15:22
  **/
 public interface UserService {
-    Result getUserInfo(Integer userId);
+    Result getUserInfo();
+
+    User findUserById(Long userId);
+
 }
