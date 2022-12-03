@@ -89,4 +89,22 @@ public class JwtUtil {
         }
         return Integer.parseInt(userId);
     }
+
+    public static String getUserRoleFromToken(String JK_Token) {
+        if (!StringUtils.hasText(JK_Token) || !JK_Token.startsWith("Bearer ")) {
+            return null;
+        }
+
+        JK_Token = JK_Token.substring(7);
+
+        String role;
+        try {
+            Claims claims = JwtUtil.parseJWT(JK_Token);
+            Map<String, Object> map = new HashMap<>(claims);
+            role = map.get("role").toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return role;
+    }
 }

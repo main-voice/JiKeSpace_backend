@@ -29,7 +29,7 @@ public class LoginController {
     public Result login(@RequestBody UserDTO userDTO) {
         String password = userDTO.getPassword();
         String email = userDTO.getEmail();
-        return Result.success(loginService.createTokenByEmail(email, password));
+        return loginService.createTokenByEmail(email, password);
     }
 
     @PostMapping("logout/")
