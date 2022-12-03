@@ -1,18 +1,13 @@
 package com.tjsse.jikespace.service.impl;
 
-import com.tjsse.jikespace.auth_user.AppUser;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.vo.UserVO;
-import com.tjsse.jikespace.service.UserInfoService;
+import com.tjsse.jikespace.mapper.UserMapper;
+import com.tjsse.jikespace.service.UserService;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.StatusCode;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.tjsse.jikespace.utils.StatusCode.*;
 
@@ -25,15 +20,14 @@ import static com.tjsse.jikespace.utils.StatusCode.*;
  **/
 
 @Service
-public class UserInfoServiceImpl implements UserInfoService {
+public class UserInfoServiceImpl implements UserService {
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
-    public Result getUserInfo() {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        // get context
-// login email token email database id
-        AppUser loginUser = (AppUser) usernamePasswordAuthenticationToken.getPrincipal();
-        User user = loginUser.getUser();
+    public Result getUserInfo(Integer userId) {
+
+        User user = userMapper.selectById(userId);
 
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);

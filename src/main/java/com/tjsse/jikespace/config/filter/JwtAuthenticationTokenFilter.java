@@ -18,6 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -50,11 +52,16 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         String userid;
         try {
             Claims claims = JwtUtil.parseJWT(token);
-            userid = claims.getSubject();
+            Map<String, Object> map = new HashMap<>(claims);
+            userid = map.get("subject").toString();
+            if (userid == null) {
+                System.out.println("userid is null at jwtAuthenticationTokenFilter.java");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
+        // TODO 下面根据登录信息生成用户，需要根据token，得到用户的角色，动态生成authenticationToken
         User user = userMapper.selectById(Integer.parseInt(userid));
 
         if (user == null) {

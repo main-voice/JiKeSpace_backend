@@ -46,20 +46,23 @@ public class LoginServiceImpl implements LoginService {
         AppUser appUser = (AppUser) authenticate.getPrincipal();
         User user = appUser.getUser();
 
-        String jwt = JwtUtil.createJWT(user.getId().toString());
+        String jwt = JwtUtil.createJWT(user.getId().toString(), "admin");
 
         return jwt;
     }
 
     @Override
     public String createTokenByEmail(String email, String password) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(email, password);
-
-        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-
-        AppUser appUser = (AppUser) authenticate.getPrincipal();
-        User user = appUser.getUser();
+//        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+//                new UsernamePasswordAuthenticationToken(email, password);
+//
+//        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+//
+//        AppUser appUser = (AppUser) authenticate.getPrincipal();
+//        User user = appUser.getUser();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("email", email);
+        User user = userMapper.selectOne(queryWrapper);
 
         // 修改用户登录信息
         LocalDateTime lastLoginTime = LocalDateTime.now();
@@ -70,7 +73,7 @@ public class LoginServiceImpl implements LoginService {
                 .set("status", LOG_IN.getCode());
         userMapper.update(null, userUpdateWrapper);
 
-        String jwt = JwtUtil.createJWT(user.getId().toString());
+        String jwt = JwtUtil.createJWT(user.getId().toString(), "user");
 
         return jwt;
     }

@@ -9,6 +9,6 @@ import com.tjsse.jikespace.utils.Result;
  * @author: peng peng
  * @date: 2022-12-02 15:22
  **/
-public interface UserInfoService {
-    Result getUserInfo();
+public interface UserService {
+    Result getUserInfo(Integer userId);
 }
