@@ -81,7 +81,8 @@ public class JwtUtil {
         String userId;
         try {
             Claims claims = JwtUtil.parseJWT(JK_Token);
-            userId = claims.getSubject();
+            Map<String, Object> map = new HashMap<>(claims);
+            userId = map.get("subject").toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
