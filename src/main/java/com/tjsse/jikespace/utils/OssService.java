@@ -97,7 +97,7 @@ public class OssService {
 
             // make the name of file unique
             String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-            fileName = beginPath + uuid + "-" + fileName;
+            fileName = beginPath + "/" + uuid + "-" + fileName;
 
             System.out.println("fileName : " + fileName);
 

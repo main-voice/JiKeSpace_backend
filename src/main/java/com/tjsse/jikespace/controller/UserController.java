@@ -8,6 +8,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @program: JiKeSpace
  * @description: 获取用户基本信息
@@ -31,10 +37,16 @@ public class UserController {
         return result;
     }
 
+    // just for test
     @PostMapping("uploadImg/")
-    public String imageUpload(@RequestParam("image") MultipartFile image) {
-        String img = ossService.uploadFile(image);
-        return img;
+    public List<String> imageUpload(MultipartFile[] imag) {
+        List<String> array = new ArrayList<String>();
+        for (MultipartFile image1:
+             imag) {
+            String img = ossService.uploadFile(image1, "dest");
+            array.add(img);
+        }
+        return array;
     }
 
 }
