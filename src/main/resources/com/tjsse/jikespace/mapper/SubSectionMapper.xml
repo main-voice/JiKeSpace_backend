@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--MyBatis配置文件-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tjsse.jikespace.mapper.SubSectionMapper">
+    <!--    List<Tag> findTagBySectionId(Long sectionId);-->
+    <select id="findSubSectionBySectionId" parameterType="Long" resultType="com.tjsse.jikespace.entity.SubSection">
+        select id,name from jk_subsection
+        where id in
+              (select subsection_id from jk_section_subsection where section_id = #{sectionId})
+    </select>
+</mapper>

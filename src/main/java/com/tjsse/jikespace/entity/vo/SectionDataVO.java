@@ -1,5 +1,6 @@
 package com.tjsse.jikespace.entity.vo;
 
+import com.tjsse.jikespace.entity.SubSection;
 import com.tjsse.jikespace.entity.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class SectionDataVO {
 
     private String sectionSummary;
 
-    private List<Tag> tagList;
+    private List<SubSection> subSectionList;
 
     private List<PostDataVO> postVOList;
 }

@@ -39,7 +39,7 @@ public class User {
 
     private LocalDateTime createTime;
 
-    private Integer deleted;
+    private Integer isDeleted;
 
     private String email;
 

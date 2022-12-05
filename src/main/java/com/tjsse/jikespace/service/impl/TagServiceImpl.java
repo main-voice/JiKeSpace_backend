@@ -1,12 +1,11 @@
 package com.tjsse.jikespace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.tjsse.jikespace.entity.PostTag;
+import com.tjsse.jikespace.entity.PostAndTag;
 import com.tjsse.jikespace.entity.Tag;
-import com.tjsse.jikespace.mapper.PostTagMapper;
+import com.tjsse.jikespace.mapper.PostAndTagMapper;
 import com.tjsse.jikespace.mapper.TagMapper;
 import com.tjsse.jikespace.service.TagService;
-import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +24,7 @@ public class TagServiceImpl implements TagService {
     @Autowired
     private TagMapper tagMapper;
     @Autowired
-    private PostTagMapper postTagMapper;
+    private PostAndTagMapper postTagMapper;
     @Override
     public List<Tag> findTagBySectionId(Long sectionId) {
         List<Tag> tagList = tagMapper.findTagBySectionId(sectionId);
@@ -34,12 +33,12 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<Long> findPostIdByTagId(Long tagId) {
-        LambdaQueryWrapper<PostTag> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(PostTag::getTagId,tagId);
-        List<PostTag> postTags = postTagMapper.selectList(queryWrapper);
+        LambdaQueryWrapper<PostAndTag> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(PostAndTag::getTagId,tagId);
+        List<PostAndTag> postAndTags = postTagMapper.selectList(queryWrapper);
         List<Long> postIdList = new ArrayList<>();
-        for(PostTag postTag:postTags){
-            postIdList.add(postTag.getPostId());
+        for(PostAndTag postAndTag : postAndTags){
+            postIdList.add(postAndTag.getPostId());
         }
         return postIdList;
     }

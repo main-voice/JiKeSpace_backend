@@ -5,18 +5,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- *  通过标签来筛选帖子
+ * 显示帖子信息
  *
  * @author wlf 1557177832@qq.com
- * @version 2022/12/3 20:11
+ * @version 2022/12/4 22:21
  * @since JDK18
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostsWithTagDTO {
-    private Long sectionId;
-    private Long subsectionId;
-    private Integer curPage;
+public class PostDataDTO {
+    private Long postId;
+    private Integer offset;
     private Integer limit;
 }

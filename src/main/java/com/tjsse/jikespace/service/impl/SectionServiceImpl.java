@@ -2,12 +2,13 @@ package com.tjsse.jikespace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.tjsse.jikespace.entity.Section;
-import com.tjsse.jikespace.entity.User;
+import com.tjsse.jikespace.entity.SubSection;
 import com.tjsse.jikespace.entity.dto.PostsWithTagDTO;
 import com.tjsse.jikespace.entity.dto.SectionDataDTO;
 import com.tjsse.jikespace.entity.vo.PostDataVO;
 import com.tjsse.jikespace.entity.vo.SectionDataVO;
 import com.tjsse.jikespace.mapper.SectionMapper;
+import com.tjsse.jikespace.mapper.SubSectionMapper;
 import com.tjsse.jikespace.service.*;
 import com.tjsse.jikespace.utils.Result;
 import com.tjsse.jikespace.utils.StatusCode;
@@ -28,7 +29,7 @@ public class SectionServiceImpl implements SectionService {
     @Autowired
     private SectionMapper sectionMapper;
     @Autowired
-    private TagService tagService;
+    private SubSectionMapper subSectionMapper;
     @Autowired
     private CollectService collectService;
     @Autowired
@@ -50,7 +51,7 @@ public class SectionServiceImpl implements SectionService {
         sectionDataVO.setPostCounts(section.getPostCounts());
         sectionDataVO.setIsCollected(collectService.isUserCollectSection(userId,sectionId));
         sectionDataVO.setSectionSummary(section.getSectionSummary());
-        sectionDataVO.setTagList(tagService.findTagBySectionId(sectionId));
+        sectionDataVO.setSubSectionList(this.findSubSectionBySectionId(sectionId));
         sectionDataVO.setPostVOList(postService.findPostBySectionIdWithPage(sectionId,curPage,limit));
 
         return Result.success(sectionDataVO);
@@ -65,22 +66,36 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
+    public SubSection findSubSectionById(Long subsectionId) {
+        LambdaQueryWrapper<SubSection> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SubSection::getId,subsectionId);
+        queryWrapper.last("limit 1");
+        return this.subSectionMapper.selectOne(queryWrapper);
+    }
+
+    @Override
     public Result getPostsByTag(PostsWithTagDTO postsWithTagDTO) {
         Long sectionId = postsWithTagDTO.getSectionId();
-        Long tagId = postsWithTagDTO.getTagId();
+        Long subsectionId = postsWithTagDTO.getSubsectionId();
         Integer curPage = postsWithTagDTO.getCurPage();
         Integer limit = postsWithTagDTO.getLimit();
 
-        if(sectionId==null||tagId==null||curPage==null||limit==null)
+        if(sectionId==null||subsectionId==null||curPage==null||limit==null)
             return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg(),null);
         Section section = this.findSectionById(sectionId);
         if(section==null){
             return Result.fail(-1,"该版块不存在，参数有误",null);
         }
 
-        List<PostDataVO> postList = postService.findPostBySectionIdAndTagId(sectionId, tagId, curPage, limit);
-        if(postList==null)
+        List<PostDataVO> postList = postService.findPostBySectionIdAndSubSectionId(sectionId, subsectionId, curPage, limit);
+        if(postList.size()==0)
             return Result.fail(-1,"没有帖子含该标签",null);
-        return Result.success(10,"test",postList);
+        return Result.success(postList);
+    }
+
+    @Override
+    public List<SubSection> findSubSectionBySectionId(Long sectionId) {
+        List<SubSection> subSectionList = subSectionMapper.findSubSectionBySectionId(sectionId);
+        return subSectionList;
     }
 }

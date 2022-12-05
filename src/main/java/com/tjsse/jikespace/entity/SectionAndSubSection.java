@@ -8,19 +8,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户收藏的版块的信息
+ * section与subsection的联系集
  *
  * @author wlf 1557177832@qq.com
- * @version 2022/12/3 15:17
+ * @version 2022/12/4 11:07
  * @since JDK18
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "jk_collect_section")
-public class CollectSection {
+@TableName(value = "jk_section_subsection")
+public class SectionAndSubSection {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long userId;
-    private Long sectionId;
+
+    private Long section_id;
+
+    private Long subsection_id;
 }
