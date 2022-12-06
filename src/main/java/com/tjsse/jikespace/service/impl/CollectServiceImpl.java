@@ -8,8 +8,8 @@ import com.tjsse.jikespace.mapper.CollectAndPostMapper;
 import com.tjsse.jikespace.mapper.CollectAndSectionMapper;
 import com.tjsse.jikespace.mapper.SectionMapper;
 import com.tjsse.jikespace.service.CollectService;
+import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +70,7 @@ public class CollectServiceImpl implements CollectService {
             Section section = sectionMapper.selectOne(queryWrapper1);
             section.setPostCounts(section.getPostCounts()-1);
             sectionMapper.updateById(section);
-            return Result.success(StatusCode.SUCCESS.getCode(),"已取消收藏");
+            return Result.success(JKCode.SUCCESS.getCode(),"已取消收藏");
         }
         else {
             CollectAndSection collectAndSection = new CollectAndSection();

@@ -2,7 +2,6 @@ package com.tjsse.jikespace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.tjsse.jikespace.auth_user.AppUser;
 import com.tjsse.jikespace.entity.Admin;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.mapper.AdminMapper;
@@ -10,16 +9,13 @@ import com.tjsse.jikespace.mapper.UserMapper;
 import com.tjsse.jikespace.service.LoginService;
 import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-import static com.tjsse.jikespace.utils.StatusCode.*;
+import static com.tjsse.jikespace.utils.JKCode.*;
 
 /**
  * @program: JiKeSpace

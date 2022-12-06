@@ -6,7 +6,7 @@ package com.tjsse.jikespace.utils;
  * @since JDK18
  */
 
-public enum StatusCode {
+public enum JKCode {
     SUCCESS(20000, "请求成功"),
     PARAMS_ERROR(10001,"参数有误"),
     ACCOUNT_NOT_EXIST(10002,"用户名或密码不存在"),
@@ -20,12 +20,15 @@ public enum StatusCode {
     // user status
     LOG_IN(20, "已登录"),
     LOG_OUT(30, "已登出"),
-    BANNED(40, "已封禁");
+    BANNED(40, "已封禁"),
+
+    SELL_POST(50, "出售帖"),
+    BUY_POST(60, "求购帖");
 
     private Integer code;
     private String msg;
 
-    StatusCode(Integer code, String msg){
+    JKCode(Integer code, String msg){
         this.code = code;
         this.msg = msg;
     }

@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.mapper.UserMapper;
 import com.tjsse.jikespace.service.RegisterService;
+import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ public class RegisterServiceImpl implements RegisterService {
         List<User> userList = new ArrayList<>();
         userList = userMapper.selectList(queryWrapper);
         if (userList.size() >= 1) {
-            return Result.fail(StatusCode.ACCOUNT_EXIST.getCode(), "用户已存在", null);
+            return Result.fail(JKCode.ACCOUNT_EXIST.getCode(), "用户已存在", null);
         }
 
         String encodedPassword = passwordEncoder.encode(password);
@@ -47,9 +47,9 @@ public class RegisterServiceImpl implements RegisterService {
 
         int insert = userMapper.insert(user);
         if (insert == 0 || insert < 0) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "用户注册失败");
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户注册失败");
         }
 
-        return Result.success(null, StatusCode.SUCCESS.getCode());
+        return Result.success(null, JKCode.SUCCESS.getCode());
     }
 }
