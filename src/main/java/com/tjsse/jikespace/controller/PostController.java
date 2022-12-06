@@ -1,16 +1,16 @@
 package com.tjsse.jikespace.controller;
 
-
 import com.tjsse.jikespace.entity.dto.PostDataDTO;
+import com.tjsse.jikespace.service.CommentService;
+import com.tjsse.jikespace.service.PostService;
+import com.tjsse.jikespace.utils.JKCode;
+
 import com.tjsse.jikespace.entity.dto.ReplyOnCommentDTO;
 import com.tjsse.jikespace.entity.dto.ReplyOnPostDTO;
 import com.tjsse.jikespace.entity.dto.ReplyOnReplyDTO;
-import com.tjsse.jikespace.service.CommentService;
-import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.service.ReplyService;
 import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +37,7 @@ public class PostController {
     public Result getPostData(@RequestHeader("JK-Token") String jk_token, @RequestBody PostDataDTO postDataDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
         return postService.getPostData(userId,postDataDTO);
@@ -47,12 +47,12 @@ public class PostController {
     public Result collectPost(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String ,String> map){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
         Long id = Long.valueOf(map.get("id"));
         if(id==null){
-            return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg());
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg());
         }
         return postService.collectPost(userId,id);
     }
@@ -61,11 +61,11 @@ public class PostController {
     public Result replyOnPost(@RequestHeader("JK-Token") String jk_token, @RequestBody ReplyOnPostDTO replyOnPostDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
         if(replyOnPostDTO.getPostId()==null||replyOnPostDTO.getContent()==null){
-            return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg(),null);
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg(),null);
         }
         return commentService.replyOnPost(userId,replyOnPostDTO);
     }
@@ -74,11 +74,11 @@ public class PostController {
     public Result replyOnComment(@RequestHeader("JK-Token") String jk_token, @RequestBody ReplyOnCommentDTO replyOnCommentDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
         if(replyOnCommentDTO.getCommentId()==null||replyOnCommentDTO.getContent()==null){
-            return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg(),null);
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg(),null);
         }
         return replyService.replyOnComment(userId,replyOnCommentDTO);
     }
@@ -87,11 +87,11 @@ public class PostController {
     public Result replyOnReply(@RequestHeader("JK-Token") String jk_token, @RequestBody ReplyOnReplyDTO replyOnReplyDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
         if(replyOnReplyDTO.getReplyId()==null||replyOnReplyDTO.getContent()==null){
-            return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg(),null);
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg(),null);
         }
         return replyService.replyOnReply(userId,replyOnReplyDTO);
     }
@@ -100,12 +100,12 @@ public class PostController {
     public Result deleteComment(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String ,String> map){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
         Long commentId = Long.valueOf(map.get("commentId"));
         if(commentId==null){
-            return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg(),null);
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg(),null);
         }
         return commentService.deleteComment(userId,commentId);
     }
@@ -114,12 +114,12 @@ public class PostController {
     public Result deleteReply(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String ,String> map){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
         Long replyId = Long.valueOf(map.get("replyId"));
         if(replyId==null){
-            return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg(),null);
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg(),null);
         }
         return replyService.deleteReply(userId,replyId);
     }

@@ -4,7 +4,7 @@ import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.service.SectionService;
 import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.StatusCode;
+import com.tjsse.jikespace.utils.JKCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +29,7 @@ public class HomePageController {
     public Result collectSection(@RequestHeader("JK-Token") String jk_token){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Integer userId = Integer.parseInt(userIdStr);
         return sectionService.collectSection(userId);

@@ -3,7 +3,6 @@ package com.tjsse.jikespace.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.tjsse.jikespace.auth_user.AppUser;
 import com.tjsse.jikespace.entity.Comment;
-import com.tjsse.jikespace.entity.Post;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.vo.UserVO;
 import com.tjsse.jikespace.mapper.CommentMapper;
@@ -16,7 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import static com.tjsse.jikespace.utils.StatusCode.*;
+import static com.tjsse.jikespace.utils.JKCode.*;
 
 /**
  * @program: JiKeSpace

@@ -4,10 +4,8 @@ import com.tjsse.jikespace.entity.dto.UserDTO;
 import com.tjsse.jikespace.service.LoginService;
 import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.StatusCode;
+import com.tjsse.jikespace.utils.JKCode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -37,7 +35,7 @@ public class LoginController {
     public Result logout(@RequestHeader("JK-Token") String jk_token) {
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Integer userId = Integer.parseInt(userIdStr);
         return loginService.logout(userId);

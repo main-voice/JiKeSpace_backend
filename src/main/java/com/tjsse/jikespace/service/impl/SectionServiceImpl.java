@@ -14,8 +14,7 @@ import com.tjsse.jikespace.mapper.SectionMapper;
 import com.tjsse.jikespace.mapper.SubSectionMapper;
 import com.tjsse.jikespace.service.*;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.StatusCode;
-import org.springframework.beans.BeanUtils;
+import com.tjsse.jikespace.utils.JKCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,8 +45,10 @@ public class SectionServiceImpl implements SectionService {
         Long sectionId = sectionDataDTO.getSectionId();
         Integer curPage = sectionDataDTO.getCurPage();
         Integer limit = sectionDataDTO.getLimit();
-        if(sectionId==null||curPage==null||limit==null)
-            return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg(),null);
+
+        if(sectionId==null||userId==null||curPage==null||limit==null)
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(), JKCode.PARAMS_ERROR.getMsg(),null);
+
         Section section = this.findSectionById(sectionId);
         if(section==null){
             return Result.fail(-1,"该版块不存在，参数有误",null);
@@ -87,7 +88,7 @@ public class SectionServiceImpl implements SectionService {
         Integer limit = postsWithTagDTO.getLimit();
 
         if(sectionId==null||subsectionId==null||curPage==null||limit==null)
-            return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg(),null);
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(), JKCode.PARAMS_ERROR.getMsg(),null);
         Section section = this.findSectionById(sectionId);
         if(section==null){
             return Result.fail(-1,"该版块不存在，参数有误",null);

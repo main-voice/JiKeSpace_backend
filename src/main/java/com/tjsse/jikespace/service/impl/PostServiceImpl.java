@@ -13,7 +13,7 @@ import com.tjsse.jikespace.mapper.PostMapper;
 import com.tjsse.jikespace.mapper.SectionMapper;
 import com.tjsse.jikespace.service.*;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.StatusCode;
+import com.tjsse.jikespace.utils.JKCode;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,7 +82,7 @@ public class PostServiceImpl implements PostService {
         Integer limit = postDataDTO.getLimit();
 
         if(postId==null||offset==null||limit==null){
-            return Result.fail(StatusCode.PARAMS_ERROR.getCode(),StatusCode.PARAMS_ERROR.getMsg());
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg());
         }
 
         LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
