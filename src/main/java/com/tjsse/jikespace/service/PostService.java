@@ -17,4 +17,8 @@ public interface PostService {
     Result collectPost(Long userId, Long postId);
 
     Result publishPost(Long userId, PostPublishDTO postPublishDTO);
+
+    Result hotPost();
+
+    Result getNews();
 }

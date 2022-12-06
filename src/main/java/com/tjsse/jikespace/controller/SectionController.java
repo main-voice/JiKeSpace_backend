@@ -49,9 +49,8 @@ public class SectionController {
         if (userIdStr == null) {
             return Result.fail(StatusCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
-        Integer userId = Integer.parseInt(userIdStr);
-        sectionDataDTO.setUserId((long) userId);
-        return sectionService.getSectionData(sectionDataDTO);
+        Long userId = Long.valueOf(userIdStr);
+        return sectionService.getSectionData(userId,sectionDataDTO);
     }
 
     @GetMapping("get_posts_by_tag")

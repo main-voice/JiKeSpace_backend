@@ -9,7 +9,7 @@ import com.tjsse.jikespace.utils.Result;
 import java.util.List;
 
 public interface SectionService {
-    Result getSectionData(SectionDataDTO sectionDataDTO);
+    Result getSectionData(Long userId,SectionDataDTO sectionDataDTO);
 
     Section findSectionById(Long sectionId);
     SubSection findSubSectionById(Long subsectionId);
@@ -17,4 +17,10 @@ public interface SectionService {
     Result getPostsByTag(PostsWithTagDTO postsWithTagDTO);
 
     List<SubSection> findSubSectionBySectionId(Long sectionId);
+
+    Result collectSection(Integer userId);
+
+    Result hotSection(Integer i);
+
+    Result searchSection(String content);
 }

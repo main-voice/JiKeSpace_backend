@@ -17,8 +17,6 @@ import lombok.NoArgsConstructor;
 public class SectionDataDTO {
     private Long sectionId;
 
-    private Long userId;
-
     private Integer curPage;
 
     private Integer limit;

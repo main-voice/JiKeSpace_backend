@@ -28,9 +28,11 @@ public class Section {
 
     private String sectionSummary;
 
-    private String sectionAvater;
+    private String sectionAvatar;
 
     private Integer postCounts;
 
     private Integer userCounts;
+
+    private Boolean isDeleted;
 }

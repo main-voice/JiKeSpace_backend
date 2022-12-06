@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostDataDTO {
-    private Long postId;
+    private Long Id;
     private Integer offset;
     private Integer limit;
 }

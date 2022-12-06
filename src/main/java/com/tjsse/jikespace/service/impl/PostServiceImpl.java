@@ -77,7 +77,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Result getPostData(Long userId, PostDataDTO postDataDTO) {
-        Long postId = postDataDTO.getPostId();
+        Long postId = postDataDTO.getId();
         Integer offset = postDataDTO.getOffset();
         Integer limit = postDataDTO.getLimit();
 
@@ -174,6 +174,25 @@ public class PostServiceImpl implements PostService {
         sectionMapper.updateById(section);
 
         return Result.success(20000,"操作成功",null);
+    }
+
+    @Override
+    public Result hotPost() {
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(Post::getCommentCounts);
+        queryWrapper.last("limit 10");
+        List<Post> postList = postMapper.selectList(queryWrapper);
+        return Result.success(copyList(postList));
+    }
+
+    @Override
+    public Result getNews() {
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Post::getSectionId,1);
+        queryWrapper.orderByDesc(Post::getCommentCounts);
+        queryWrapper.last("limit 10");
+        List<Post> postList = postMapper.selectList(queryWrapper);
+        return Result.success(copyList(postList));
     }
 
 
