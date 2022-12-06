@@ -15,4 +15,5 @@ public interface UserService {
 
     User findUserById(Long userId);
 
+    Long findUserIdByCommentId(Long commentId);
 }

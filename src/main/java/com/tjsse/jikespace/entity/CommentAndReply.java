@@ -7,25 +7,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 /**
- * 评论
- *
  * @author wlf 1557177832@qq.com
- * @version 2022/12/4 23:31
+ * @version 2022/12/6 16:20
  * @since JDK18
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "jk_comment")
-public class Comment {
+@TableName(value = "jk_comment_reply")
+public class CommentAndReply {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long bodyId;
-    private Long postId;
-    private Long authorId;
-    private Boolean isDeleted;
-    private LocalDateTime updateTime;
+    private Long commentId;
+    private Long replyId;
 }
