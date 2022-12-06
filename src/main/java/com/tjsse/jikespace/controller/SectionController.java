@@ -69,25 +69,12 @@ public class SectionController {
     }
 
     @PostMapping("publish_post/")
-    public Result publishPost(@RequestHeader("JK-Token") String jk_token
-            ,MultipartFile[] file, @RequestBody PostPublishDTO postPublishDTO){
-        List<String> stringList =new ArrayList<>();
-        for (MultipartFile image:
-             file) {
-            stringList.add(ossService.uploadFile(image,"post"));
-        }
+    public Result publishPost(@RequestHeader("JK-Token") String jk_token, @RequestBody PostPublishDTO postPublishDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
-        Post post = new Post();
-        post.setSectionId(postPublishDTO.getSectionId());
-        post.setTitle(postPublishDTO.getTitle());
-        post.setSubsectionId(postPublishDTO.getSubsectionId());
-        post.setAuthorId(userId);
-        this.postMapper.insert(post);
-        postService.insertPostBody(post.getId(),postPublishDTO.getContent());
-        return Result.success(20000,"操作成功");
+        return postService.publishPost(userId,postPublishDTO);
     }
 }

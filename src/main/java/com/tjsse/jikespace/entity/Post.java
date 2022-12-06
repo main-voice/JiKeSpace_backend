@@ -30,13 +30,13 @@ public class Post {
 
     private String title;
 
-    private Boolean deleted;
+    private Boolean isDeleted;
 
     private String postStatus;
 
     private Integer viewCounts;
 
-    private Integer weight;
+    private Boolean isPinned;
 
     private Long authorId;
 

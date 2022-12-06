@@ -2,8 +2,10 @@ package com.tjsse.jikespace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.tjsse.jikespace.auth_user.AppUser;
+import com.tjsse.jikespace.entity.Comment;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.vo.UserVO;
+import com.tjsse.jikespace.mapper.CommentMapper;
 import com.tjsse.jikespace.mapper.UserMapper;
 import com.tjsse.jikespace.service.UserService;
 import com.tjsse.jikespace.utils.Result;
@@ -28,6 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private CommentMapper commentMapper;
     @Override
     public Result getUserInfo() {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
@@ -48,6 +52,15 @@ public class UserServiceImpl implements UserService {
         queryWrapper.eq(User::getId,userId);
         queryWrapper.last("limit 1");
         return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public Long findUserIdByCommentId(Long commentId) {
+        LambdaQueryWrapper<Comment> queryWrapper =new LambdaQueryWrapper<>();
+        queryWrapper.eq(Comment::getId,commentId);
+        queryWrapper.last("limit 1");
+        Comment comment = commentMapper.selectOne(queryWrapper);
+        return comment.getAuthorId();
     }
 
 }
