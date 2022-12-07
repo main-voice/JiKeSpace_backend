@@ -4,20 +4,14 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.tjsse.jikespace.service.EmailService;
 import com.tjsse.jikespace.service.UserService;
-import com.tjsse.jikespace.utils.JKCode;
-import com.tjsse.jikespace.utils.OssService;
 import com.tjsse.jikespace.utils.RedisUtils;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.tjsse.jikespace.utils.JKCode.*;
+import static com.tjsse.jikespace.utils.JKCode.OTHER_ERROR;
+import static com.tjsse.jikespace.utils.JKCode.PARAMS_ERROR;
 
 /**
  * @program: JiKeSpace

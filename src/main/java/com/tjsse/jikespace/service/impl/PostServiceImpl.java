@@ -2,26 +2,25 @@ package com.tjsse.jikespace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.tjsse.jikespace.entity.*;
+import com.tjsse.jikespace.entity.Post;
+import com.tjsse.jikespace.entity.PostAndBody;
+import com.tjsse.jikespace.entity.Section;
+import com.tjsse.jikespace.entity.SubSection;
 import com.tjsse.jikespace.entity.dto.PostDataDTO;
 import com.tjsse.jikespace.entity.dto.PostPublishDTO;
 import com.tjsse.jikespace.entity.vo.PostDataVO;
 import com.tjsse.jikespace.entity.vo.PostVO;
-import com.tjsse.jikespace.mapper.CollectAndPostMapper;
 import com.tjsse.jikespace.mapper.PostAndBodyMapper;
 import com.tjsse.jikespace.mapper.PostMapper;
-import com.tjsse.jikespace.mapper.SectionMapper;
 import com.tjsse.jikespace.service.*;
-import com.tjsse.jikespace.utils.Result;
 import com.tjsse.jikespace.utils.JKCode;
+import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

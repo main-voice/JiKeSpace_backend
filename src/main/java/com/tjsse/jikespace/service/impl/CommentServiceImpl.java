@@ -13,7 +13,6 @@ import com.tjsse.jikespace.service.CommentService;
 import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.service.UserService;
 import com.tjsse.jikespace.utils.Result;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
