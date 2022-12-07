@@ -43,6 +43,8 @@ public class RegisterServiceImpl implements RegisterService {
                 .username(username)
                 .password(encodedPassword)
                 .email(email)
+                .isDeleted(false)
+                .isModerator(false)
                 .build();
 
         int insert = userMapper.insert(user);

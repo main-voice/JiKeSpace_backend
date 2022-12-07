@@ -11,6 +11,7 @@ import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,9 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     AdminMapper adminMapper;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     // 删除此代码后无法运行，虽然提示没有用到，但是由于自动注入，配置类会用到，不可删@！！！！
     @Autowired
@@ -63,7 +67,12 @@ public class LoginServiceImpl implements LoginService {
         User user = userMapper.selectOne(queryWrapper);
 
         if (user == null) {
-            return Result.fail(ACCOUNT_NOT_EXIST.getCode(), ACCOUNT_EXIST.getMsg(), null);
+            return Result.fail(ACCOUNT_NOT_EXIST.getCode(), "用户不存在", null);
+        }
+
+        boolean matches = passwordEncoder.matches(password, user.getPassword());
+        if (!matches) {
+            return Result.fail(PWD_ERROR.getCode(), PWD_ERROR.getMsg(), null);
         }
 
         // 修改用户登录信息

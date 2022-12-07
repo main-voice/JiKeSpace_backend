@@ -1,13 +1,9 @@
 package com.tjsse.jikespace.utils;
 
-import com.tjsse.jikespace.entity.User;
-import com.tjsse.jikespace.mapper.UserMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 

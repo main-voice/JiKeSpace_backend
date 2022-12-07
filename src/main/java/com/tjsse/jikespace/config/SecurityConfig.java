@@ -51,7 +51,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(
                 "/admin/login/",
                 "/user/login/",
-                "/user/register/");
+                "/user/register/",
+                "/user/reset-pwd/",
+                "/user/send-email-code/");
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {

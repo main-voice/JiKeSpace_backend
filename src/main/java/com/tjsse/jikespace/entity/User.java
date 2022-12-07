@@ -29,7 +29,7 @@ public class User {
 
     private String username;
 
-    private String isModerator;
+    private Boolean isModerator;
 
     private String studentId;
 
@@ -39,7 +39,7 @@ public class User {
 
     private LocalDateTime createTime;
 
-    private Integer isDeleted;
+    private Boolean isDeleted;
 
     private String email;
 

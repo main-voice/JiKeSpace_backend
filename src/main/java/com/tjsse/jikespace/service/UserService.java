@@ -16,4 +16,8 @@ public interface UserService {
     User findUserById(Long userId);
 
     Long findUserIdByCommentId(Long commentId);
+
+    Result resetPassword(String verifyCode, String email, String newPassword);
+
+    Result sendEmailVerifyCode(String email);
 }
