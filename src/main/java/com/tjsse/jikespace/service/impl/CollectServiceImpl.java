@@ -8,6 +8,8 @@ import com.tjsse.jikespace.mapper.CollectAndPostMapper;
 import com.tjsse.jikespace.mapper.CollectAndSectionMapper;
 import com.tjsse.jikespace.mapper.SectionMapper;
 import com.tjsse.jikespace.service.CollectService;
+import com.tjsse.jikespace.service.SectionService;
+import com.tjsse.jikespace.service.ThreadService;
 import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +25,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CollectServiceImpl implements CollectService {
     @Autowired
+    private SectionService sectionService;
+    @Autowired
     private CollectAndPostMapper collectAndPostMapper;
     @Autowired
     private CollectAndSectionMapper collectAndSectionMapper;
-    @Autowired
-    private SectionMapper sectionMapper;
+
 
 
     @Override
@@ -45,7 +48,7 @@ public class CollectServiceImpl implements CollectService {
     @Override
     public Boolean isUserCollectSection(Long userId, Long sectionId) {
         LambdaQueryWrapper<CollectAndSection> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(CollectAndSection::getId,sectionId);
+        queryWrapper.eq(CollectAndSection::getSectionId,sectionId);
         queryWrapper.eq(CollectAndSection::getUserId,userId);
         queryWrapper.last("limit 1");
         if(collectAndSectionMapper.selectOne(queryWrapper)==null)
@@ -64,12 +67,7 @@ public class CollectServiceImpl implements CollectService {
             queryWrapper.last("limit 1");
             this.collectAndSectionMapper.delete(queryWrapper);
 
-            LambdaQueryWrapper<Section> queryWrapper1 = new LambdaQueryWrapper<>();
-            queryWrapper1.eq(Section::getId,sectionId);
-            queryWrapper1.last("limit 1");
-            Section section = sectionMapper.selectOne(queryWrapper1);
-            section.setPostCounts(section.getPostCounts()-1);
-            sectionMapper.updateById(section);
+            sectionService.updateSectionByCollectCount(sectionId,false);
             return Result.success(JKCode.SUCCESS.getCode(),"已取消收藏");
         }
         else {
@@ -78,13 +76,29 @@ public class CollectServiceImpl implements CollectService {
             collectAndSection.setUserId(userId);
             this.collectAndSectionMapper.insert(collectAndSection);
 
-            LambdaQueryWrapper<Section> queryWrapper2 = new LambdaQueryWrapper<>();
-            queryWrapper2.eq(Section::getId,sectionId);
-            queryWrapper2.last("limit 1");
-            Section section = sectionMapper.selectOne(queryWrapper2);
-            section.setPostCounts(section.getPostCounts()+1);
-            sectionMapper.updateById(section);
+            sectionService.updateSectionByCollectCount(sectionId,true);
             return Result.success(20000,"收藏成功");
+        }
+    }
+
+    @Override
+    public Result collectPost(Long userId, Long postId) {
+        LambdaQueryWrapper<CollectAndPost> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CollectAndPost::getPostId,postId);
+        queryWrapper.eq(CollectAndPost::getUserId,userId);
+        queryWrapper.last("limit 1");
+        CollectAndPost collectAndPost1 = collectAndPostMapper.selectOne(queryWrapper);
+
+        if(collectAndPost1 == null){
+            CollectAndPost collectAndPost =new CollectAndPost();
+            collectAndPost.setPostId(postId);
+            collectAndPost.setUserId(userId);
+            collectAndPostMapper.insert(collectAndPost);
+            return Result.success(20000,"收藏成功");
+        }
+        else{
+            collectAndPostMapper.delete(queryWrapper);
+            return Result.success(20000,"取消收藏成功");
         }
     }
 }

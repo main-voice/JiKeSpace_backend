@@ -14,11 +14,11 @@ public interface PostService {
 
     Result getPostData(Long userId, PostDataDTO postDataDTO);
 
-    Result collectPost(Long userId, Long postId);
-
-    Result publishPost(Long userId, PostPublishDTO postPublishDTO);
-
     Result hotPost();
 
     Result getNews();
+
+    Result publishPost(Long userId, PostPublishDTO postPublishDTO);
+
+    void updatePostByCommentCount(Long postId, boolean b);
 }

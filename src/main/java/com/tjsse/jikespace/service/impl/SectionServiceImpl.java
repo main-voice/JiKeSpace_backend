@@ -40,6 +40,8 @@ public class SectionServiceImpl implements SectionService {
     private CollectService collectService;
     @Autowired
     private PostService postService;
+    @Autowired
+    private ThreadService threadService;
     @Override
     public Result getSectionData(Long userId,SectionDataDTO sectionDataDTO) {
         Long sectionId = sectionDataDTO.getSectionId();
@@ -96,7 +98,7 @@ public class SectionServiceImpl implements SectionService {
 
         List<PostDataVO> postList = postService.findPostBySectionIdAndSubSectionId(sectionId, subsectionId, curPage, limit);
         if(postList.size()==0)
-            return Result.fail(-1,"没有帖子含该标签",null);
+            return Result.fail(-1,"该子版块下没有帖子",null);
         return Result.success(20000,postList);
     }
 
@@ -147,6 +149,18 @@ public class SectionServiceImpl implements SectionService {
         queryWrapper.like(Section::getSectionName,content);
         List<Section> sections = sectionMapper.selectList(queryWrapper);
         return Result.success(20000,copyList(sections));
+    }
+
+    @Override
+    public void updateSectionByCollectCount(Long sectionId, boolean b) {
+        Section section = this.findSectionById(sectionId);
+        threadService.updateSectionByCollectCount(sectionMapper,section,b);
+    }
+
+    @Override
+    public void updateSectionByPostCount(Long sectionId, boolean b) {
+        Section section = this.findSectionById(sectionId);
+        threadService.updateSectionByPostCount(sectionMapper,section,true);
     }
 
     private List<CollectSectionVO> copyList(List<Section> sections) {

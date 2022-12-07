@@ -51,20 +51,20 @@ public class SectionController {
         return sectionService.getSectionData(userId,sectionDataDTO);
     }
 
-    @GetMapping("get_posts_by_tag")
+    @GetMapping("get_posts_by_subsection/")
     public Result getPostsByTag(@RequestBody PostsWithTagDTO postsWithTagDTO){
         return sectionService.getPostsByTag(postsWithTagDTO);
     }
 
     @PostMapping ("collect_section/")
     public Result collectSection(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String, String> map){
-        Integer sectionId = Integer.valueOf(map.get("sectionId"));
+        Long sectionId = Long.valueOf(map.get("sectionId"));
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
-        Integer userId = Integer.parseInt(userIdStr);
-        return collectService.collectSection((long)userId,(long)sectionId);
+        Long userId = Long.valueOf(userIdStr);
+        return collectService.collectSection(userId,sectionId);
     }
 
     @PostMapping("publish_post/")

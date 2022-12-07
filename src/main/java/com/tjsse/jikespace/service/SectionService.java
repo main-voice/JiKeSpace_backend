@@ -23,4 +23,8 @@ public interface SectionService {
     Result hotSection(Integer i);
 
     Result searchSection(String content);
+
+    void updateSectionByCollectCount(Long sectionId, boolean b);
+
+    void updateSectionByPostCount(Long sectionId, boolean b);
 }
