@@ -38,9 +38,7 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private PostAndBodyMapper postAndBodyMapper;
     @Autowired
-    private CollectAndPostMapper collectAndPostMapper;
-    @Autowired
-    private SectionMapper sectionMapper;
+    private ThreadService threadService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -123,29 +121,10 @@ public class PostServiceImpl implements PostService {
 
         postVO.setCommentCounts(post.getCommentCounts());
         postVO.setCommentVOList(commentService.findCommentVOsByPostIdWithPage(userId,postId,offset,limit));
+        threadService.updateViewCount(postMapper,post); //通过线程池更新阅读数
         return Result.success(20000,postVO);
     }
 
-    @Override
-    public Result collectPost(Long userId, Long postId) {
-        LambdaQueryWrapper<CollectAndPost> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(CollectAndPost::getPostId,postId);
-        queryWrapper.eq(CollectAndPost::getUserId,userId);
-        queryWrapper.last("limit 1");
-        CollectAndPost collectAndPost1 = collectAndPostMapper.selectOne(queryWrapper);
-
-        if(collectAndPost1 == null){
-            CollectAndPost collectAndPost =new CollectAndPost();
-            collectAndPost.setPostId(postId);
-            collectAndPost.setUserId(userId);
-            collectAndPostMapper.insert(collectAndPost);
-            return Result.success(20000,"收藏成功");
-        }
-        else{
-            collectAndPostMapper.delete(queryWrapper);
-            return Result.success(20000,"取消收藏成功");
-        }
-    }
 
     @Override
     public Result publishPost(Long userId, PostPublishDTO postPublishDTO) {
@@ -166,14 +145,23 @@ public class PostServiceImpl implements PostService {
         post.setBodyId(postAndBody.getId());
         postMapper.updateById(post);
 
-        LambdaQueryWrapper<Section> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Section::getId,postPublishDTO.getSectionId());
-        queryWrapper.last("limit 1");
-        Section section = sectionMapper.selectOne(queryWrapper);
-        section.setPostCounts(section.getPostCounts()+1);
-        sectionMapper.updateById(section);
-
+        sectionService.updateSectionByPostCount(postPublishDTO.getSectionId(),true);
         return Result.success(20000,"操作成功",null);
+    }
+
+    @Override
+    public void updatePostByCommentCount(Long postId, boolean b) {
+        Post post = this.findPostById(postId);
+        threadService.updatePostByCommentCount(postMapper,post,true);
+    }
+
+    private Post findPostById(Long postId) {
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Post::getId, postId);
+        queryWrapper.eq(Post::getIsDeleted,false);
+        queryWrapper.last("limit 1");
+        Post post = postMapper.selectOne(queryWrapper);
+        return post;
     }
 
     @Override

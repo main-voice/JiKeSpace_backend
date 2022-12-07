@@ -10,6 +10,7 @@ import com.tjsse.jikespace.mapper.CommentMapper;
 import com.tjsse.jikespace.mapper.PostAndCommentMapper;
 import com.tjsse.jikespace.mapper.PostMapper;
 import com.tjsse.jikespace.service.CommentService;
+import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.service.UserService;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.BeanUtils;
@@ -38,6 +39,8 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private UserService userService;
     @Autowired
+    private PostService postService;
+    @Autowired
     private PostAndCommentMapper postAndCommentMapper;
 
     @Override
@@ -64,14 +67,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Result replyOnPost(Long userId, ReplyOnPostDTO replyOnPostDTO) {
-        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
         Long postId = replyOnPostDTO.getPostId();
-        queryWrapper.eq(Post::getId, postId);
-        queryWrapper.eq(Post::getIsDeleted,false);
-        queryWrapper.last("limit 1");
-        Post post = postMapper.selectOne(queryWrapper);
-        post.setCommentCounts(post.getCommentCounts()+1);
-        postMapper.updateById(post);
+
+        postService.updatePostByCommentCount(postId,true);
 
         String content = replyOnPostDTO.getContent();
         Comment comment = new Comment();

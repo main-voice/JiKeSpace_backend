@@ -1,6 +1,7 @@
 package com.tjsse.jikespace.controller;
 
 import com.tjsse.jikespace.entity.dto.PostDataDTO;
+import com.tjsse.jikespace.service.CollectService;
 import com.tjsse.jikespace.service.CommentService;
 import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.utils.JKCode;
@@ -32,6 +33,8 @@ public class PostController {
     private CommentService commentService;
     @Autowired
     private ReplyService replyService;
+    @Autowired
+    private CollectService collectService;
 
     @GetMapping("post_data/")
     public Result getPostData(@RequestHeader("JK-Token") String jk_token, @RequestBody PostDataDTO postDataDTO){
@@ -54,7 +57,7 @@ public class PostController {
         if(id==null){
             return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg());
         }
-        return postService.collectPost(userId,id);
+        return collectService.collectPost(userId,id);
     }
 
     @PostMapping("reply_on_post")

@@ -1,5 +1,6 @@
 package com.tjsse.jikespace.service;
 
+import com.tjsse.jikespace.entity.dto.PostPublishDTO;
 import com.tjsse.jikespace.utils.Result;
 
 public interface CollectService {
@@ -7,4 +8,6 @@ public interface CollectService {
     Boolean isUserCollectSection(Long userId,Long sectionId);
 
     Result collectSection(Long userId, Long sectionId);
+
+    Result collectPost(Long userId, Long id);
 }
