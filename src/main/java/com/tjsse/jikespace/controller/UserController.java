@@ -2,13 +2,22 @@ package com.tjsse.jikespace.controller;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.tjsse.jikespace.entity.dto.EditEmailDTO;
+import com.tjsse.jikespace.entity.dto.PasswordDTO;
+import com.tjsse.jikespace.entity.dto.RenameFolderDTO;
+import com.tjsse.jikespace.entity.dto.UserInfoDTO;
 import com.tjsse.jikespace.service.EmailService;
+import com.tjsse.jikespace.service.FolderService;
 import com.tjsse.jikespace.service.UserService;
+import com.tjsse.jikespace.utils.JKCode;
+import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.RedisUtils;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 import static com.tjsse.jikespace.utils.JKCode.OTHER_ERROR;
 import static com.tjsse.jikespace.utils.JKCode.PARAMS_ERROR;
@@ -28,6 +37,8 @@ public class UserController {
 
     @Autowired
     EmailService emailService;
+    @Autowired
+    private  FolderService folderService;
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
@@ -60,5 +71,76 @@ public class UserController {
         }
         return userInfoService.forgetPassword(verifyCode, email, newPassword);
     }
+
+    @PostMapping("account/edit_email/")
+    public Result editEmail(@RequestHeader("JK-Token") String jk_token, @RequestBody EditEmailDTO editEmailDTO){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.parseLong(userIdStr);
+        return userInfoService.editEmail(userId,editEmailDTO);
+    }
+
+    @GetMapping("account/get_user_info")
+    public Result getUserInformation(@RequestHeader("JK-Token") String jk_token){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.parseLong(userIdStr);
+        return userInfoService.getUserInformation(userId);
+    }
+
+    @PostMapping("account/edit_info")
+    public Result editUserInfo(@RequestHeader("JK-Token") String jk_token, @RequestBody UserInfoDTO userInfoDTO){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.parseLong(userIdStr);
+        return userInfoService.editUserInfo(userId,userInfoDTO);
+    }
+
+    @PostMapping("account/edit_password")
+    public Result editPassword(@RequestHeader("JK-Token") String jk_token, @RequestBody PasswordDTO passwordDTO){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.parseLong(userIdStr);
+        return userInfoService.editPassword(userId,passwordDTO);
+    }
+
+    @PostMapping("account/create_folder")
+    public Result createFolder(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String,String> map){
+        String folderName = map.get("folderName");
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.parseLong(userIdStr);
+        return folderService.createFolder(userId,folderName);
+    }
+
+    @PostMapping("account/rename_folder")
+    public Result renameFolder(@RequestHeader("JK-Token") String jk_token, @RequestBody RenameFolderDTO renameFolderDTO){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        return folderService.renameFolder(renameFolderDTO);
+    }
+
+    @GetMapping("account/get_folders")
+    public Result getFolders(@RequestHeader("JK-Token") String jk_token){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.parseLong(userIdStr);
+        return folderService.getFolders(userId);
+    }
+
 }
 

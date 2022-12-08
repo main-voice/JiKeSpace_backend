@@ -9,17 +9,16 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author wlf 1557177832@qq.com
- * @version 2022/12/3 15:07
+ * @version 2022/12/8 22:57
  * @since JDK18
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "jk_collect_post")
-public class CollectAndPost {
+@TableName(value = "jk_folder")
+public class Folder {
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long userId;
-    private Long postId;
-    private Long folderId;
+    private String folderName;
 }

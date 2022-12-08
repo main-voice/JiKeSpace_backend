@@ -21,6 +21,7 @@ public class UserVO {
     private String summary;
     private String avatar;
     private String email;
-    private String mobilePhoneNumber;
+    private String phoneNumber;
     private String nickname;
+    private String gender;
 }
