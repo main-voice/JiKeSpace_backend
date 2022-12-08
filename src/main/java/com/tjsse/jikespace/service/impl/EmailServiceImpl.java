@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
-import static com.tjsse.jikespace.utils.JKCode.*;
+import static com.tjsse.jikespace.utils.JKCode.EMAIL_CODE_PREFIX;
 
 /**
  * @program: JiKeSpace

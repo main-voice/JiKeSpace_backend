@@ -11,7 +11,6 @@ import com.tjsse.jikespace.mapper.CommentMapper;
 import com.tjsse.jikespace.mapper.UserMapper;
 import com.tjsse.jikespace.service.EmailService;
 import com.tjsse.jikespace.service.UserService;
-import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

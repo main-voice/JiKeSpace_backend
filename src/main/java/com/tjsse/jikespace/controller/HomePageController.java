@@ -2,9 +2,9 @@ package com.tjsse.jikespace.controller;
 
 import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.service.SectionService;
+import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
-import com.tjsse.jikespace.utils.JKCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
