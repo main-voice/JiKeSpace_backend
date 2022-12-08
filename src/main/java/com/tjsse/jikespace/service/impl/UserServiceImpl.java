@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result resetPassword(String verifyCode, String email, String newPassword) {
+    public Result forgetPassword(String verifyCode, String email, String newPassword) {
         // 检测验证码与邮箱是否正确
         boolean checkResult = emailService.checkVerifyCode(email, verifyCode);
         if (!checkResult) {

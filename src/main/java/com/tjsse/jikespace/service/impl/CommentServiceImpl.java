@@ -13,7 +13,6 @@ import com.tjsse.jikespace.service.CommentService;
 import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.service.UserService;
 import com.tjsse.jikespace.utils.Result;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +31,6 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
     @Autowired
     private CommentMapper commentMapper;
-    @Autowired
-    private PostMapper postMapper;
     @Autowired
     private CommentAndBodyMapper commentAndBodyMapper;
     @Autowired
@@ -113,13 +110,7 @@ public class CommentServiceImpl implements CommentService {
         queryWrapper2.last("limit 1");
         postAndCommentMapper.delete(queryWrapper2);
 
-        LambdaQueryWrapper<Post> queryWrapper1 = new LambdaQueryWrapper<>();
-        queryWrapper1.eq(Post::getId,comment.getPostId());
-        queryWrapper1.eq(Post::getIsDeleted,false);
-        queryWrapper.last("limit 1");
-        Post post = postMapper.selectOne(queryWrapper1);
-        post.setCommentCounts(post.getCommentCounts()-1);
-        postMapper.updateById(post);
+        postService.updatePostByCommentCount(comment.getPostId(),false);
         return Result.success(20000,"删除成功",null);
     }
 

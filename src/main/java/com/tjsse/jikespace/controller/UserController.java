@@ -55,7 +55,7 @@ public class UserController {
         return userInfoService.sendEmailVerifyCode(email);
     }
 
-    @PostMapping("reset-pwd/")
+    @PostMapping("forget-pwd/")
     public Result forgetPassword(@RequestBody JSONObject jsonObject) throws JSONException {
         String email = jsonObject.getString("email");
         String verifyCode = jsonObject.getString("verifyCode");
@@ -64,6 +64,7 @@ public class UserController {
         if (email == null || verifyCode == null || newPassword == null) {
             return Result.fail(PARAMS_ERROR.getCode(), PARAMS_ERROR.getMsg(), null);
         }
-        return userInfoService.resetPassword(verifyCode, email, newPassword);
+        return userInfoService.forgetPassword(verifyCode, email, newPassword);
     }
 }
+

@@ -52,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/admin/login/",
                 "/user/login/",
                 "/user/register/",
-                "/user/reset-pwd/",
+                "/user/forget-pwd/",
                 "/user/send-email-code/");
     }
     @Override
