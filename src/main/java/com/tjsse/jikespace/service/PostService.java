@@ -1,7 +1,9 @@
 package com.tjsse.jikespace.service;
 
+import com.tjsse.jikespace.entity.Post;
 import com.tjsse.jikespace.entity.dto.PostDataDTO;
 import com.tjsse.jikespace.entity.dto.PostPublishDTO;
+import com.tjsse.jikespace.entity.vo.FolderPostVO;
 import com.tjsse.jikespace.entity.vo.PostDataVO;
 import com.tjsse.jikespace.utils.Result;
 
@@ -21,4 +23,6 @@ public interface PostService {
     Result publishPost(Long userId, PostPublishDTO postPublishDTO);
 
     void updatePostByCommentCount(Long postId, boolean b);
+
+    List<FolderPostVO> findPostsByFolderIdWithPage(Long folderId,Integer curPage,Integer limit);
 }

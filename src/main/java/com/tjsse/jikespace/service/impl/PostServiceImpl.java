@@ -8,6 +8,7 @@ import com.tjsse.jikespace.entity.Section;
 import com.tjsse.jikespace.entity.SubSection;
 import com.tjsse.jikespace.entity.dto.PostDataDTO;
 import com.tjsse.jikespace.entity.dto.PostPublishDTO;
+import com.tjsse.jikespace.entity.vo.FolderPostVO;
 import com.tjsse.jikespace.entity.vo.PostDataVO;
 import com.tjsse.jikespace.entity.vo.PostVO;
 import com.tjsse.jikespace.mapper.PostAndBodyMapper;
@@ -154,6 +155,19 @@ public class PostServiceImpl implements PostService {
         threadService.updatePostByCommentCount(postMapper,post,true);
     }
 
+    @Override
+    public List<FolderPostVO> findPostsByFolderIdWithPage(Long folderId,Integer curPage,Integer limit) {
+        List<Long> postIds = collectService.findPostIdsByFolderId(folderId);
+        if(postIds==null||postIds.size()==0){
+            return null;
+        }
+        Page<Post> postPage = new Page<>(curPage,limit);
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Post::getId,postIds);
+        Page<Post> postPage1 = postMapper.selectPage(postPage, queryWrapper);
+        return copyListFolder(postPage1.getRecords());
+    }
+
     private Post findPostById(Long postId) {
         LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Post::getId, postId);
@@ -191,10 +205,29 @@ public class PostServiceImpl implements PostService {
         return voList;
     }
 
+    private List<FolderPostVO> copyListFolder(List<Post> postList) {
+        List<FolderPostVO> voList = new ArrayList<>();
+        for(Post post : postList){
+            voList.add(copyFolder(post));
+        }
+        return voList;
+    }
+
     private PostDataVO copy(Post post) {
         PostDataVO postDataVO = new PostDataVO();
         BeanUtils.copyProperties(post,postDataVO);
         postDataVO.setPoster(userService.findUserById(post.getAuthorId()).getUsername());
         return postDataVO;
+    }
+
+    private FolderPostVO copyFolder(Post post){
+        FolderPostVO folderPostVO = new FolderPostVO();
+        folderPostVO.setTime(post.getUpdateTime());
+        folderPostVO.setPostId(post.getId());
+        folderPostVO.setTitle(post.getTitle());
+        Section sectionById = sectionService.findSectionById(post.getSectionId());
+        folderPostVO.setSectionName(sectionById.getSectionName());
+        folderPostVO.setPosterName(userService.findUserById(post.getAuthorId()).getUsername());
+        return folderPostVO;
     }
 }

@@ -1,14 +1,11 @@
 package com.tjsse.jikespace.controller;
 
-import com.tjsse.jikespace.entity.dto.PostDataDTO;
+import com.tjsse.jikespace.entity.dto.*;
 import com.tjsse.jikespace.service.CollectService;
 import com.tjsse.jikespace.service.CommentService;
 import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.utils.JKCode;
 
-import com.tjsse.jikespace.entity.dto.ReplyOnCommentDTO;
-import com.tjsse.jikespace.entity.dto.ReplyOnPostDTO;
-import com.tjsse.jikespace.entity.dto.ReplyOnReplyDTO;
 import com.tjsse.jikespace.service.ReplyService;
 import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
@@ -47,17 +44,13 @@ public class PostController {
     }
 
     @PostMapping("collect_post/")
-    public Result collectPost(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String ,String> map){
+    public Result collectPost(@RequestHeader("JK-Token") String jk_token, @RequestBody CollectPostDTO collectPostDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
-        Long id = Long.valueOf(map.get("id"));
-        if(id==null){
-            return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg());
-        }
-        return collectService.collectPost(userId,id);
+        return collectService.collectPost(userId,collectPostDTO);
     }
 
     @PostMapping("reply_on_post")

@@ -31,11 +31,7 @@ public class SectionController {
     @Autowired
     private CollectService collectService;
     @Autowired
-    private OssService ossService;
-    @Autowired
     private PostService postService;
-    @Autowired
-    private PostMapper postMapper;
 
     @GetMapping("get_section_data/")
     public Result getSectionData(@RequestHeader("JK-Token") String jk_token,@RequestBody SectionDataDTO sectionDataDTO){

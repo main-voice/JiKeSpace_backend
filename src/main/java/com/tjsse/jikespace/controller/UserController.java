@@ -2,10 +2,8 @@ package com.tjsse.jikespace.controller;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.tjsse.jikespace.entity.dto.EditEmailDTO;
-import com.tjsse.jikespace.entity.dto.PasswordDTO;
-import com.tjsse.jikespace.entity.dto.RenameFolderDTO;
-import com.tjsse.jikespace.entity.dto.UserInfoDTO;
+import com.tjsse.jikespace.entity.Folder;
+import com.tjsse.jikespace.entity.dto.*;
 import com.tjsse.jikespace.service.EmailService;
 import com.tjsse.jikespace.service.FolderService;
 import com.tjsse.jikespace.service.UserService;
@@ -82,7 +80,7 @@ public class UserController {
         return userInfoService.editEmail(userId,editEmailDTO);
     }
 
-    @GetMapping("account/get_user_info")
+    @GetMapping("account/get_user_info/")
     public Result getUserInformation(@RequestHeader("JK-Token") String jk_token){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -92,7 +90,7 @@ public class UserController {
         return userInfoService.getUserInformation(userId);
     }
 
-    @PostMapping("account/edit_info")
+    @PostMapping("account/edit_info/")
     public Result editUserInfo(@RequestHeader("JK-Token") String jk_token, @RequestBody UserInfoDTO userInfoDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -102,7 +100,7 @@ public class UserController {
         return userInfoService.editUserInfo(userId,userInfoDTO);
     }
 
-    @PostMapping("account/edit_password")
+    @PostMapping("account/edit_password/")
     public Result editPassword(@RequestHeader("JK-Token") String jk_token, @RequestBody PasswordDTO passwordDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -112,7 +110,7 @@ public class UserController {
         return userInfoService.editPassword(userId,passwordDTO);
     }
 
-    @PostMapping("account/create_folder")
+    @PostMapping("account/create_folder/")
     public Result createFolder(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String,String> map){
         String folderName = map.get("folderName");
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
@@ -123,7 +121,7 @@ public class UserController {
         return folderService.createFolder(userId,folderName);
     }
 
-    @PostMapping("account/rename_folder")
+    @PostMapping("account/rename_folder/")
     public Result renameFolder(@RequestHeader("JK-Token") String jk_token, @RequestBody RenameFolderDTO renameFolderDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -132,7 +130,7 @@ public class UserController {
         return folderService.renameFolder(renameFolderDTO);
     }
 
-    @GetMapping("account/get_folders")
+    @GetMapping("account/get_folders/")
     public Result getFolders(@RequestHeader("JK-Token") String jk_token){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -140,6 +138,27 @@ public class UserController {
         }
         Long userId = Long.parseLong(userIdStr);
         return folderService.getFolders(userId);
+    }
+
+    @GetMapping("account/get_collect_info/")
+    public Result getCollectInfo(@RequestHeader("JK-Token") String jk_token,@RequestBody FolderPostDTO folderPostDTO){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.parseLong(userIdStr);
+        return folderService.getCollectInfo(userId,folderPostDTO);
+    }
+
+    @DeleteMapping("account/delete_folder/")
+    public Result deleteFolder(@RequestHeader("JK-Token") String jk_token,@RequestBody Map<String,String> map){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.parseLong(userIdStr);
+        Long folderId = Long.valueOf(map.get("folderId"));
+        return folderService.deleteFolder(userId,folderId);
     }
 
 }

@@ -3,6 +3,7 @@ package com.tjsse.jikespace.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.tjsse.jikespace.entity.CollectAndPost;
 import com.tjsse.jikespace.entity.CollectAndSection;
+import com.tjsse.jikespace.entity.dto.CollectPostDTO;
 import com.tjsse.jikespace.mapper.CollectAndPostMapper;
 import com.tjsse.jikespace.mapper.CollectAndSectionMapper;
 import com.tjsse.jikespace.service.CollectService;
@@ -11,6 +12,9 @@ import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 收藏功能的实现类
@@ -79,10 +83,18 @@ public class CollectServiceImpl implements CollectService {
     }
 
     @Override
-    public Result collectPost(Long userId, Long postId) {
+    public Result collectPost(Long userId, CollectPostDTO collectPostDTO) {
+        Long postId = collectPostDTO.getId();
+        Long folderId = collectPostDTO.getFolderId();
+        if(postId==null||folderId==null){
+            return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg());
+        }
+
+
         LambdaQueryWrapper<CollectAndPost> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(CollectAndPost::getPostId,postId);
         queryWrapper.eq(CollectAndPost::getUserId,userId);
+        queryWrapper.eq(CollectAndPost::getFolderId,folderId);
         queryWrapper.last("limit 1");
         CollectAndPost collectAndPost1 = collectAndPostMapper.selectOne(queryWrapper);
 
@@ -90,6 +102,7 @@ public class CollectServiceImpl implements CollectService {
             CollectAndPost collectAndPost =new CollectAndPost();
             collectAndPost.setPostId(postId);
             collectAndPost.setUserId(userId);
+            collectAndPost.setFolderId(folderId);
             collectAndPostMapper.insert(collectAndPost);
             return Result.success(20000,"收藏成功");
         }
@@ -97,5 +110,28 @@ public class CollectServiceImpl implements CollectService {
             collectAndPostMapper.delete(queryWrapper);
             return Result.success(20000,"取消收藏成功");
         }
+    }
+
+    @Override
+    public List<Long> findPostIdsByFolderId(Long folderId) {
+        LambdaQueryWrapper<CollectAndPost> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CollectAndPost::getFolderId,folderId);
+        List<CollectAndPost> collectAndPosts = collectAndPostMapper.selectList(queryWrapper);
+        if(collectAndPosts.size()==0){
+            return null;
+        }
+        List<Long> postIds = new ArrayList<>();
+        for (CollectAndPost collectAndPost :
+                collectAndPosts) {
+            postIds.add(collectAndPost.getPostId());
+        }
+        return postIds;
+    }
+
+    @Override
+    public void deleteCollectPostByFolderId(Long folderId) {
+        LambdaQueryWrapper<CollectAndPost> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CollectAndPost::getFolderId,folderId);
+        collectAndPostMapper.delete(queryWrapper);
     }
 }

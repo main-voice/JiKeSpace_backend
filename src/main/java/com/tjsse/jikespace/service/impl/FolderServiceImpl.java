@@ -2,10 +2,14 @@ package com.tjsse.jikespace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.tjsse.jikespace.entity.Folder;
+import com.tjsse.jikespace.entity.dto.FolderPostDTO;
 import com.tjsse.jikespace.entity.dto.RenameFolderDTO;
+import com.tjsse.jikespace.entity.vo.FolderPostVO;
 import com.tjsse.jikespace.entity.vo.FolderVO;
 import com.tjsse.jikespace.mapper.FolderMapper;
+import com.tjsse.jikespace.service.CollectService;
 import com.tjsse.jikespace.service.FolderService;
+import com.tjsse.jikespace.service.PostService;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +23,21 @@ import java.util.List;
  * @version 2022/12/8 23:07
  * @since JDK18
  */
+
 @Service
 public class FolderServiceImpl implements FolderService {
     @Autowired
     private FolderMapper folderMapper;
+    @Autowired
+    private CollectService collectService;
+    @Autowired
+    private PostService postService;
     @Override
     public Result createFolder(Long userId, String folderName) {
         LambdaQueryWrapper<Folder> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Folder::getUserId,userId);
         queryWrapper.eq(Folder::getFolderName,folderName);
+        queryWrapper.last("limit 1");
         Folder folder = folderMapper.selectOne(queryWrapper);
         if(folder!=null){
             return Result.fail(-1,"该文件夹名字重复",null);
@@ -49,6 +59,7 @@ public class FolderServiceImpl implements FolderService {
         LambdaQueryWrapper<Folder> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Folder::getId,folderId);
         queryWrapper.eq(Folder::getFolderName,folderName);
+        queryWrapper.last("limit 1");
         Folder folder = folderMapper.selectOne(queryWrapper);
         if(folder==null){
             Folder folderById = this.findFolderById(folderId);
@@ -69,6 +80,37 @@ public class FolderServiceImpl implements FolderService {
         return Result.success(copyList(folders));
     }
 
+    @Override
+    public Result getCollectInfo(Long userId, FolderPostDTO folderPostDTO) {
+        Long folderId = folderPostDTO.getFolderId();
+        Integer curPage = folderPostDTO.getCurPage();
+        Integer limit = folderPostDTO.getLimit();
+        if(folderId==null||curPage==null||limit==null){
+            return Result.fail(-1,"参数有误",null);
+        }
+
+        List<FolderPostVO> folderPostVOList = postService.findPostsByFolderIdWithPage(folderId,curPage,limit);
+
+
+        return Result.success(20000,"okk",folderPostVOList);
+    }
+
+    @Override
+    public Result deleteFolder(Long userId, Long folderId) {
+        LambdaQueryWrapper<Folder> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Folder::getId,folderId);
+        queryWrapper.last("limit 1");
+        Folder folder = folderMapper.selectOne(queryWrapper);
+        if(folder==null){
+            return Result.fail(-1,"参数有误",null);
+        }
+        folderMapper.deleteById(folder);
+
+        collectService.deleteCollectPostByFolderId(folderId);
+
+        return Result.success(20000,"操作成功",null);
+    }
+
     private List<FolderVO> copyList(List<Folder> folders) {
         List<FolderVO> folderVOList = new ArrayList<>();
         for (Folder folder :
@@ -87,6 +129,7 @@ public class FolderServiceImpl implements FolderService {
     private Folder findFolderById(Long folderId) {
         LambdaQueryWrapper<Folder> queryWrapper =new LambdaQueryWrapper<>();
         queryWrapper.eq(Folder::getId,folderId);
+        queryWrapper.last("limit 1");
         Folder folder = folderMapper.selectOne(queryWrapper);
         return folder;
     }
