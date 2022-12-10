@@ -58,7 +58,7 @@ public class OssService {
 
             fileName = datePath + "/" + fileName;
 
-            System.out.println("fileName : " + fileName);
+//            System.out.println("fileName : " + fileName);
 
             ossClient.putObject(bucketName, fileName, inputStream);
 
