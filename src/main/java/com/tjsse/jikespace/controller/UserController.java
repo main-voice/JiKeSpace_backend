@@ -41,15 +41,13 @@ public class UserController {
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
-    @GetMapping("info/")
-    public Result getUserInfo() {
-        Result result = new Result();
-        result = userInfoService.getUserInfo();
-        return result;
+    @GetMapping("info")
+    public Result getUserInfo(@RequestHeader("JK-Token") String token) {
+        return userInfoService.getUserInfo(token);
     }
 
 
-    @GetMapping("send-email-code/")
+    @GetMapping("send-email-code")
     public Result sendEmailCode(@RequestParam(value = "email") String email) {
         RedisUtils redisUtils = new RedisUtils(stringRedisTemplate);
         if (email == null) {
@@ -58,7 +56,7 @@ public class UserController {
         return userInfoService.sendEmailVerifyCode(email);
     }
 
-    @PostMapping("forget-pwd/")
+    @PostMapping("forget-pwd")
     public Result forgetPassword(@RequestBody JSONObject jsonObject) throws JSONException {
         String email = jsonObject.getString("email");
         String verifyCode = jsonObject.getString("verifyCode");

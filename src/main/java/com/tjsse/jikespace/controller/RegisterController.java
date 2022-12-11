@@ -23,7 +23,7 @@ public class RegisterController {
     @Autowired
     private RegisterService registerService;
 
-    @PostMapping("register/")
+    @PostMapping("register")
     public Result registerUser(@RequestBody UserDTO userDTO) {
 
         String username = userDTO.getUsername();

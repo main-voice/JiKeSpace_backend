@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * @program: JiKeSpace
  * @description: 返回给前端的用户类
@@ -16,12 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserVO {
-    private Long id;
-    private String username;
-    private String summary;
+    private String name;
     private String avatar;
-    private String email;
-    private String phoneNumber;
-    private String nickname;
-    private String gender;
+    private List<String> roles;
+    private Boolean isAuthenticated;
 }

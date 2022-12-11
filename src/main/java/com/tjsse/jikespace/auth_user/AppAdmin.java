@@ -35,7 +35,7 @@ public class AppAdmin implements UserDetails {
 
     @Override
     public String getUsername() {
-        return admin.getAdminName();
+        return admin.getUsername();
     }
 
     @Override

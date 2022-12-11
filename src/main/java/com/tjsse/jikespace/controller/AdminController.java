@@ -20,12 +20,11 @@ public class AdminController {
     @Autowired
     private LoginService loginService;
 
-    @PostMapping("login/")
+    @PostMapping("login")
     public Result login(@RequestBody Admin admin) {
         String password = admin.getPassword();
-        String adminName = admin.getAdminName();
-//        System.out.println(password + " , " + adminName);
-        return loginService.createTokenByAdminName(adminName, password);
+        String username = admin.getUsername();
+        return loginService.createTokenByAdminName(username, password);
     }
 
     @GetMapping("info/")

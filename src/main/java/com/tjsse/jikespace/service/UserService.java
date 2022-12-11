@@ -14,7 +14,7 @@ import com.tjsse.jikespace.utils.Result;
  * @date: 2022-12-02 15:22
  **/
 public interface UserService {
-    Result getUserInfo();
+    Result getUserInfo(String token);
 
     User findUserById(Long userId);
 
