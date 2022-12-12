@@ -7,14 +7,15 @@ import com.tjsse.jikespace.entity.dto.*;
 import com.tjsse.jikespace.service.EmailService;
 import com.tjsse.jikespace.service.FolderService;
 import com.tjsse.jikespace.service.UserService;
-import com.tjsse.jikespace.utils.JKCode;
-import com.tjsse.jikespace.utils.JwtUtil;
-import com.tjsse.jikespace.utils.RedisUtils;
-import com.tjsse.jikespace.utils.Result;
+import com.tjsse.jikespace.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.tjsse.jikespace.utils.JKCode.OTHER_ERROR;
@@ -32,6 +33,8 @@ import static com.tjsse.jikespace.utils.JKCode.PARAMS_ERROR;
 public class UserController {
     @Autowired
     private UserService userInfoService;
+    @Autowired
+    private OssService ossService;
 
     @Autowired
     EmailService emailService;
@@ -41,7 +44,7 @@ public class UserController {
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
-    @GetMapping("info/")
+    @GetMapping("info")
     public Result getUserInfo() {
         Result result = new Result();
         result = userInfoService.getUserInfo();
@@ -49,7 +52,7 @@ public class UserController {
     }
 
 
-    @GetMapping("send-email-code/")
+    @GetMapping("send-email-code")
     public Result sendEmailCode(@RequestParam(value = "email") String email) {
         RedisUtils redisUtils = new RedisUtils(stringRedisTemplate);
         if (email == null) {
@@ -58,7 +61,7 @@ public class UserController {
         return userInfoService.sendEmailVerifyCode(email);
     }
 
-    @PostMapping("forget-pwd/")
+    @PostMapping("forget-pwd")
     public Result forgetPassword(@RequestBody JSONObject jsonObject) throws JSONException {
         String email = jsonObject.getString("email");
         String verifyCode = jsonObject.getString("verifyCode");
@@ -70,7 +73,7 @@ public class UserController {
         return userInfoService.forgetPassword(verifyCode, email, newPassword);
     }
 
-    @PostMapping("account/edit_email/")
+    @PostMapping("account/edit_email")
     public Result editEmail(@RequestHeader("JK-Token") String jk_token, @RequestBody EditEmailDTO editEmailDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -80,7 +83,7 @@ public class UserController {
         return userInfoService.editEmail(userId,editEmailDTO);
     }
 
-    @GetMapping("account/get_user_info/")
+    @GetMapping("account/get_user_info")
     public Result getUserInformation(@RequestHeader("JK-Token") String jk_token){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -90,7 +93,7 @@ public class UserController {
         return userInfoService.getUserInformation(userId);
     }
 
-    @PostMapping("account/edit_info/")
+    @PostMapping("account/edit_info")
     public Result editUserInfo(@RequestHeader("JK-Token") String jk_token, @RequestBody UserInfoDTO userInfoDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -100,7 +103,7 @@ public class UserController {
         return userInfoService.editUserInfo(userId,userInfoDTO);
     }
 
-    @PostMapping("account/edit_password/")
+    @PostMapping("account/edit_password")
     public Result editPassword(@RequestHeader("JK-Token") String jk_token, @RequestBody PasswordDTO passwordDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -110,7 +113,7 @@ public class UserController {
         return userInfoService.editPassword(userId,passwordDTO);
     }
 
-    @PostMapping("account/create_folder/")
+    @PostMapping("account/create_folder")
     public Result createFolder(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String,String> map){
         String folderName = map.get("folderName");
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
@@ -121,7 +124,7 @@ public class UserController {
         return folderService.createFolder(userId,folderName);
     }
 
-    @PostMapping("account/rename_folder/")
+    @PostMapping("account/rename_folder")
     public Result renameFolder(@RequestHeader("JK-Token") String jk_token, @RequestBody RenameFolderDTO renameFolderDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -130,7 +133,7 @@ public class UserController {
         return folderService.renameFolder(renameFolderDTO);
     }
 
-    @GetMapping("account/get_folders/")
+    @GetMapping("account/get_folders")
     public Result getFolders(@RequestHeader("JK-Token") String jk_token){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -140,17 +143,19 @@ public class UserController {
         return folderService.getFolders(userId);
     }
 
-    @GetMapping("account/get_collect_info/")
-    public Result getCollectInfo(@RequestHeader("JK-Token") String jk_token,@RequestBody FolderPostDTO folderPostDTO){
+    @GetMapping(value = "account/get_collect_info")
+    public Result getCollectInfo(@RequestHeader("JK-Token") String jk_token,Long fordId
+            ,Integer curPage, Integer limit){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
+        FolderPostDTO folderPostDTO = new FolderPostDTO(fordId,curPage,limit);
         return folderService.getCollectInfo(userId,folderPostDTO);
     }
 
-    @DeleteMapping("account/delete_folder/")
+    @DeleteMapping("account/delete_folder")
     public Result deleteFolder(@RequestHeader("JK-Token") String jk_token,@RequestBody Map<String,String> map){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -159,6 +164,20 @@ public class UserController {
         Long userId = Long.parseLong(userIdStr);
         Long folderId = Long.valueOf(map.get("folderId"));
         return folderService.deleteFolder(userId,folderId);
+    }
+
+    @PostMapping("account/change_avater/")
+    public Result changeAvater(@RequestHeader("JK-Token") String jk_token
+            ,@RequestHeader("Content-Type") String type,@RequestParam("Avater") MultipartFile avater){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.parseLong(userIdStr);
+
+        String s = ossService.uploadFile(avater);
+
+        return Result.success(20000,"okk",s);
     }
 
 }

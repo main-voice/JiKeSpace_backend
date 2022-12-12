@@ -33,22 +33,24 @@ public class SectionController {
     @Autowired
     private PostService postService;
 
-    @GetMapping("get_section_data/")
-    public Result getSectionData(@RequestHeader("JK-Token") String jk_token,@RequestBody SectionDataDTO sectionDataDTO){
+    @GetMapping("get_section_data")
+    public Result getSectionData(@RequestHeader("JK-Token") String jk_token,Integer sectionId,Integer curPage,Integer limit){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.valueOf(userIdStr);
+        SectionDataDTO sectionDataDTO = new SectionDataDTO((long)sectionId,curPage,limit);
         return sectionService.getSectionData(userId,sectionDataDTO);
     }
 
-    @GetMapping("get_posts_by_subsection/")
-    public Result getPostsByTag(@RequestBody PostsWithTagDTO postsWithTagDTO){
+    @GetMapping("get_posts_by_subsection")
+    public Result getPostsByTag(Integer sectionId,Integer subsectionId,Integer curPage,Integer limit){
+        PostsWithTagDTO postsWithTagDTO = new PostsWithTagDTO((long)sectionId,(long)subsectionId,curPage,limit);
         return sectionService.getPostsByTag(postsWithTagDTO);
     }
 
-    @PostMapping ("collect_section/")
+    @PostMapping ("collect_section")
     public Result collectSection(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String, String> map){
         Long sectionId = Long.valueOf(map.get("sectionId"));
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
@@ -59,13 +61,13 @@ public class SectionController {
         return collectService.collectSection(userId,sectionId);
     }
 
-    @PostMapping("publish_post/")
+    @PostMapping("publish_post")
     public Result publishPost(@RequestHeader("JK-Token") String jk_token, @RequestBody PostPublishDTO postPublishDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
-        Long userId = Long.parseLong(userIdStr);
+        Long userId = Long.valueOf(userIdStr);
         return postService.publishPost(userId,postPublishDTO);
     }
 }

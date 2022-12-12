@@ -1,6 +1,7 @@
 package com.tjsse.jikespace.controller;
 
 import com.tjsse.jikespace.entity.dto.*;
+import com.tjsse.jikespace.entity.vo.PostDataVO;
 import com.tjsse.jikespace.service.CollectService;
 import com.tjsse.jikespace.service.CommentService;
 import com.tjsse.jikespace.service.PostService;
@@ -33,17 +34,18 @@ public class PostController {
     @Autowired
     private CollectService collectService;
 
-    @GetMapping("post_data/")
-    public Result getPostData(@RequestHeader("JK-Token") String jk_token, @RequestBody PostDataDTO postDataDTO){
+    @GetMapping("post_data")
+    public Result getPostData(@RequestHeader("JK-Token") String jk_token,Integer id,Integer offset,Integer limit){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
+        PostDataDTO postDataDTO = new PostDataDTO((long)id,offset,limit);
         return postService.getPostData(userId,postDataDTO);
     }
 
-    @PostMapping("collect_post/")
+    @PostMapping("collect_post")
     public Result collectPost(@RequestHeader("JK-Token") String jk_token, @RequestBody CollectPostDTO collectPostDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
