@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * @program: JiKeSpace
  * @description: post for transaction
@@ -31,9 +33,10 @@ public class TransactionPost {
     private Long authorId;
     private Long bodyId;
     private Integer tagId;
-    private Integer subTagId;
+    private Integer subtagId;
 
-    private String contactInfo;
+    private String contactType;
+    private String contactNumber;
 
     private Integer commentCounts;
     private Integer viewCounts;
@@ -43,4 +46,8 @@ public class TransactionPost {
 
     private Integer postType;
 
+    private Integer price;
+    private String campus;
+    private String coverImage;
+    private LocalDateTime publishTime;
 }

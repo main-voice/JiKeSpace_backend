@@ -14,6 +14,7 @@ import com.tjsse.jikespace.mapper.CommentMapper;
 import com.tjsse.jikespace.mapper.UserMapper;
 import com.tjsse.jikespace.service.EmailService;
 import com.tjsse.jikespace.service.UserService;
+import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.tjsse.jikespace.utils.JKCode.*;
 
@@ -49,16 +53,45 @@ public class UserServiceImpl implements UserService {
     PasswordEncoder passwordEncoder;
 
     @Override
-    public Result getUserInfo() {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        // get context
-// login email token email database id
-        AppUser loginUser = (AppUser) usernamePasswordAuthenticationToken.getPrincipal();
-        User user = loginUser.getUser();
+    public Result getUserInfo(String token) {
+        String userIdFromToken = JwtUtil.getUserIdFromToken(token);
+        String role = JwtUtil.getUserRoleFromToken(token);
+
+        assert userIdFromToken != null;
+        Integer userId = Integer.parseInt(userIdFromToken);
 
         UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            return Result.fail(OTHER_ERROR.getCode(), "用户不存在", null);
+        }
+
+        if (user.getNickname() == null) {
+            userVO.setName(user.getUsername());
+        } else {
+            userVO.setName(user.getNickname());
+        }
+        userVO.setAvatar(user.getAvatar());
+
+        List<String> roles = new ArrayList<>();
+        roles.add(role);
+
+        if (role != null &&
+                user.getStudentId() != null &&
+                (user.getStudentId().length() == 7 || user.getStudentId().length() == 5)) {
+            roles.add("student"); // 在校生身份
+        }
+        if (role != null && user.getIsModerator()) {
+            roles.add("moderator"); // 版主身份
+        }
+
+        if (user.getStudentId() != null) {
+            userVO.setIsAuthenticated(true); // 已认证
+        } else {
+            userVO.setIsAuthenticated(false);
+        }
+
+        userVO.setRoles(roles);
         return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), userVO);
     }
 

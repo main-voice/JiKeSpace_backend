@@ -8,18 +8,16 @@ import java.util.List;
 
 /**
  * @program: JiKeSpace
- * @description: 返回给前端的用户类
+ * @description: vo for tags
  * @packagename: com.tjsse.jikespace.entity.vo
  * @author: peng peng
- * @date: 2022-12-02 15:26
+ * @date: 2022-12-10 14:36
  **/
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserVO {
-    private String name;
-    private String avatar;
-    private List<String> roles;
-    private Boolean isAuthenticated;
+public class TagVO {
+    Long tagId;
+    String tagName;
+    List<SubtagVO> subtagList;
 }

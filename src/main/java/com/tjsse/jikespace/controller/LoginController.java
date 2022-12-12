@@ -23,7 +23,7 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-    @PostMapping("login/")
+    @PostMapping("login")
     public Result login(@RequestBody UserDTO userDTO) {
         String username = userDTO.getUsername();
         String password = userDTO.getPassword();
@@ -31,7 +31,7 @@ public class LoginController {
         return loginService.createTokenByEmail(email, password);
     }
 
-    @PostMapping("logout/")
+    @PostMapping("logout")
     public Result logout(@RequestHeader("JK-Token") String jk_token) {
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {

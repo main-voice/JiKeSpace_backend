@@ -21,7 +21,7 @@ public class Admin {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String adminName;
+    private String username;
 
     private String password;
 

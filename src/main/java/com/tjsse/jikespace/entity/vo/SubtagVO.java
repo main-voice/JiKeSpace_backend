@@ -4,22 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * @program: JiKeSpace
- * @description: 返回给前端的用户类
+ * @description: vo for subtag
  * @packagename: com.tjsse.jikespace.entity.vo
  * @author: peng peng
- * @date: 2022-12-02 15:26
+ * @date: 2022-12-10 14:37
  **/
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserVO {
-    private String name;
-    private String avatar;
-    private List<String> roles;
-    private Boolean isAuthenticated;
+public class SubtagVO {
+    Long subtagId;
+    String subtagName;
 }

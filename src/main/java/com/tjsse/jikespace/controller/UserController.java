@@ -45,12 +45,9 @@ public class UserController {
     StringRedisTemplate stringRedisTemplate;
 
     @GetMapping("info")
-    public Result getUserInfo() {
-        Result result = new Result();
-        result = userInfoService.getUserInfo();
-        return result;
+    public Result getUserInfo(@RequestHeader("JK-Token") String token) {
+        return userInfoService.getUserInfo(token);
     }
-
 
     @GetMapping("send-email-code")
     public Result sendEmailCode(@RequestParam(value = "email") String email) {

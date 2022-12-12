@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.tjsse.jikespace.utils.JKCode.*;
 
@@ -89,7 +91,10 @@ public class LoginServiceImpl implements LoginService {
         if(jwt == null) {
             return Result.fail(OTHER_ERROR.getCode(), "token 生成失败", null);
         }
-        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), jwt);
+        Map<String, String> map = new HashMap<>();
+        map.put("token", jwt);
+
+        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), map);
     }
 
     @Override
