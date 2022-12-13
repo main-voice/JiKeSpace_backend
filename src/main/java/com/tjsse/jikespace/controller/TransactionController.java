@@ -26,31 +26,31 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @GetMapping("tags/all/")
-    public Result getAllTabs() {
+    @GetMapping("tag")
+    public Result getAllTags() {
         return transactionService.getAllTags();
     }
 
-    @GetMapping("posts/")
+    @GetMapping("sale_info")
     public Result getTransactionPost(@RequestBody SearchTransactionDTO searchTransactionDTO) {
         return transactionService.getTransactionInfoByPage(searchTransactionDTO);
     }
 
-    @GetMapping("post/{id}/")
+    @GetMapping("post/{id}")
     public Result getTransactionPostById(@PathVariable(value = "id") Long id) {
         return transactionService.getTransactionInfoById(id);
     }
 
-    @PostMapping("publish/")
+    @PostMapping("publish")
     public Result createNewTransactionPost(@RequestParam("type") String type,
                                            @RequestParam("title") String title,
                                            @RequestParam("price") Integer price,
-                                           @RequestParam("tag_id") Integer tagId,
-                                           @RequestParam("subtag_id") Integer subtagId,
+                                           @RequestParam("tagId") Integer tagId,
+                                           @RequestParam("subtagId") Integer subtagId,
                                            @RequestParam("content") String content,
-                                           @RequestParam("campus_zone") String campus,
-                                           @RequestParam("contact_type") String contactType,
-                                           @RequestParam("contact_number") String contactNumber,
+                                           @RequestParam("campusZone") String campus,
+                                           @RequestParam("contactType") String contactType,
+                                           @RequestParam("contactNumber") String contactNumber,
                                            @RequestParam("image")MultipartFile[] multipartFiles,
                                            @RequestHeader("JK-Token") String token)
     {
