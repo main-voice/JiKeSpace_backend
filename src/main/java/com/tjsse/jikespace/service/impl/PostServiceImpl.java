@@ -2,10 +2,7 @@ package com.tjsse.jikespace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.tjsse.jikespace.entity.Post;
-import com.tjsse.jikespace.entity.PostAndBody;
-import com.tjsse.jikespace.entity.Section;
-import com.tjsse.jikespace.entity.SubSection;
+import com.tjsse.jikespace.entity.*;
 import com.tjsse.jikespace.entity.dto.PostDataDTO;
 import com.tjsse.jikespace.entity.dto.PostPublishDTO;
 import com.tjsse.jikespace.entity.vo.FolderPostVO;
@@ -85,6 +82,7 @@ public class PostServiceImpl implements PostService {
 
         LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Post::getId,postId);
+        queryWrapper.eq(Post::getIsDeleted,false);
         queryWrapper.last("limit 1");
         Post post = postMapper.selectOne(queryWrapper);
 
@@ -93,16 +91,21 @@ public class PostServiceImpl implements PostService {
         }
 
         PostVO postVO = new PostVO();
+
         postVO.setTitle(post.getTitle());
         postVO.setIsCollected(collectService.isUserCollectPost(userId,postId));
         postVO.setSectionId(post.getSectionId());
+
         Section section = sectionService.findSectionById(post.getSectionId());
-        if(section.getSectionName()==null){
-            postVO.setSectionName(null);
-        }
-        else {
-            postVO.setSectionName(section.getSectionName());
-        }
+        postVO.setSectionName(section.getSectionName());
+        postVO.setTime(post.getUpdateTime());
+        postVO.setContent(this.findBodyByPostId(postId));
+
+        User user = userService.findUserById(postId);
+        postVO.setAuthor(user.getUsername());
+        postVO.setAvatar(user.getAvatar());
+        postVO.setBrowseNumber(post.getViewCounts());
+
 
         if(post.getSubsectionId()==null){
             postVO.setSubsectionId(null);
@@ -119,10 +122,23 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        postVO.setCommentCounts(post.getCommentCounts());
+        postVO.setTotal(post.getCommentCounts()+1);
         postVO.setCommentVOList(commentService.findCommentVOsByPostIdWithPage(userId,postId,offset,limit));
+
         threadService.updateViewCount(postMapper,post); //通过线程池更新阅读数
+
         return Result.success(20000,postVO);
+    }
+
+    private String findBodyByPostId(Long postId) {
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Post::getId,postId);
+        queryWrapper.eq(Post::getIsDeleted,false);
+        Post post = postMapper.selectOne(queryWrapper);
+        LambdaQueryWrapper<PostAndBody> queryWrapper1 = new LambdaQueryWrapper<>();
+        queryWrapper1.eq(PostAndBody::getId,post.getBodyId());
+        PostAndBody postAndBody = postAndBodyMapper.selectOne(queryWrapper1);
+        return postAndBody.getContent();
     }
 
 
@@ -135,6 +151,7 @@ public class PostServiceImpl implements PostService {
         post.setAuthorId(userId);
         post.setIsDeleted(false);
         post.setUpdateTime(LocalDateTime.now());
+        post.setPostType("交流贴");
         this.postMapper.insert(post);
 
         PostAndBody postAndBody = new PostAndBody();
@@ -166,6 +183,11 @@ public class PostServiceImpl implements PostService {
         queryWrapper.in(Post::getId,postIds);
         Page<Post> postPage1 = postMapper.selectPage(postPage, queryWrapper);
         return copyListFolder(postPage1.getRecords());
+    }
+
+    @Override
+    public Result findPostsByUserIdWithPage(Long userId, String type, Integer curPage, Integer limit) {
+        return null;
     }
 
     private Post findPostById(Long postId) {

@@ -9,6 +9,7 @@ import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.dto.EditEmailDTO;
 import com.tjsse.jikespace.entity.dto.PasswordDTO;
 import com.tjsse.jikespace.entity.dto.UserInfoDTO;
+import com.tjsse.jikespace.entity.vo.UserDataVO;
 import com.tjsse.jikespace.entity.vo.UserVO;
 import com.tjsse.jikespace.mapper.CommentMapper;
 import com.tjsse.jikespace.mapper.UserMapper;
@@ -179,8 +180,9 @@ public class UserServiceImpl implements UserService {
     public Result getUserInformation(Long userId) {
         User user = this.findUserById(userId);
 
-        UserVO userVO = new UserVO();
+        UserDataVO userVO = new UserDataVO();
         BeanUtils.copyProperties(user,userVO);
+        userVO.setIsStudent(user.getStudentId()!=null);
         return Result.success(20000,"okk",userVO);
     }
 

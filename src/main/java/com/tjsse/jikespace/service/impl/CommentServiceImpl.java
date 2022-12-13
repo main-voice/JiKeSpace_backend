@@ -47,16 +47,16 @@ public class CommentServiceImpl implements CommentService {
         queryWrapper.eq(Comment::getPostId,postId);
         queryWrapper.eq(Comment::getIsDeleted,false);
         Page<Comment> commentPage1 = commentMapper.selectPage(commentPage,queryWrapper);
-//        List<Comment> commentList = commentMapper.findCommentsByPostId(postId);
-        List<CommentVO> commentVOList = this.copyList(commentPage1.getRecords());
+        List<Comment> records = commentPage1.getRecords();
+        List<CommentVO> commentVOList = this.copyList(records);
         for (CommentVO commentVO :
                 commentVOList) {
             String userName = userService.findUserById(userId).getUsername();
-            if(commentVO.getAuthorName()==null||userName == null){
+            if(commentVO.getAuthor()==null||userName == null){
                 commentVO.setAbleToDelete(false);
             }
             else{
-                commentVO.setAbleToDelete(commentVO.getAuthorName() == userName);
+                commentVO.setAbleToDelete(commentVO.getAuthor() == userName);
             }
         }
         return commentVOList;
@@ -125,8 +125,8 @@ public class CommentServiceImpl implements CommentService {
 
     private CommentVO copy(Comment comment) {
         CommentVO commentVO = new CommentVO();
-        User user = userService.findUserById(comment.getId());
-        commentVO.setAuthorName(user.getUsername());
+        User user = userService.findUserById(comment.getAuthorId());
+        commentVO.setAuthor(user.getUsername());
         commentVO.setAvatar(user.getAvatar());
         commentVO.setUpdateTime(comment.getUpdateTime());
         commentVO.setContent(this.findContentByBodyId(comment.getBodyId()));

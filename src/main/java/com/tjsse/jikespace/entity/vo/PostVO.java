@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -23,6 +24,11 @@ public class PostVO {
     private String sectionName;
     private Long subsectionId;
     private String subsectionName;
-    private Integer commentCounts;
+    private Integer total;
+    private Integer browseNumber;
+    private String avatar;
+    private LocalDateTime time;
+    private String content;
+    private String author;
     private List<CommentVO> commentVOList;
 }

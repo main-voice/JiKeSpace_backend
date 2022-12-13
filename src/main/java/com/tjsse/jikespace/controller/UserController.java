@@ -3,19 +3,16 @@ package com.tjsse.jikespace.controller;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.tjsse.jikespace.entity.Folder;
+import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.dto.*;
-import com.tjsse.jikespace.service.EmailService;
-import com.tjsse.jikespace.service.FolderService;
-import com.tjsse.jikespace.service.UserService;
+import com.tjsse.jikespace.mapper.UserMapper;
+import com.tjsse.jikespace.service.*;
 import com.tjsse.jikespace.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import static com.tjsse.jikespace.utils.JKCode.OTHER_ERROR;
@@ -34,6 +31,8 @@ public class UserController {
     @Autowired
     private UserService userInfoService;
     @Autowired
+    private PostService postService;
+    @Autowired
     private OssService ossService;
 
     @Autowired
@@ -43,6 +42,10 @@ public class UserController {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private ThreadService threadService;
+    @Autowired
+    private UserMapper userMapper;
 
     @GetMapping("info")
     public Result getUserInfo(@RequestHeader("JK-Token") String token) {
@@ -163,18 +166,31 @@ public class UserController {
         return folderService.deleteFolder(userId,folderId);
     }
 
-    @PostMapping("account/change_avater/")
-    public Result changeAvater(@RequestHeader("JK-Token") String jk_token
-            ,@RequestHeader("Content-Type") String type,@RequestParam("Avater") MultipartFile avater){
+    @PostMapping("account/change_avatar")
+    public Result changeAvatar(@RequestHeader("JK-Token") String jk_token
+            ,@RequestHeader("Content-Type") String type,@RequestParam("Avatar") MultipartFile avatar){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
-        Long userId = Long.parseLong(userIdStr);
+        Long userId = Long.valueOf(userIdStr);
 
-        String s = ossService.uploadFile(avater);
+        String s = ossService.uploadFile(avatar);
+        User user = userInfoService.findUserById(userId);
+        user.setAvatar(s);
+        threadService.updateUserByAvatar(userMapper,user);
 
         return Result.success(20000,"okk",s);
+    }
+
+    @GetMapping("account/get_my_post")
+    public Result getMyPost(@RequestHeader("JK-Token") String jk_token,String type,Integer curPage,Integer limit){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        return  postService.findPostsByUserIdWithPage(userId,type,curPage,limit);
     }
 
 }

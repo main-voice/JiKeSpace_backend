@@ -3,8 +3,10 @@ package com.tjsse.jikespace.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.tjsse.jikespace.entity.Post;
 import com.tjsse.jikespace.entity.Section;
+import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.mapper.PostMapper;
 import com.tjsse.jikespace.mapper.SectionMapper;
+import com.tjsse.jikespace.mapper.UserMapper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -69,5 +71,9 @@ public class ThreadService {
         queryWrapper.eq(Post::getId,post.getId());
         queryWrapper.eq(Post::getCommentCounts,post.getCommentCounts());
         postMapper.update(updatePost,queryWrapper);
+    }
+
+    public void updateUserByAvatar(UserMapper userMapper, User user) {
+        userMapper.updateById(user);
     }
 }

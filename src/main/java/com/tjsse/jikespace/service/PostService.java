@@ -25,4 +25,6 @@ public interface PostService {
     void updatePostByCommentCount(Long postId, boolean b);
 
     List<FolderPostVO> findPostsByFolderIdWithPage(Long folderId,Integer curPage,Integer limit);
+
+    Result findPostsByUserIdWithPage(Long userId, String type, Integer curPage, Integer limit);
 }
