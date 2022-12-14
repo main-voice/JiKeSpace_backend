@@ -33,7 +33,16 @@ public class TransactionController {
     }
 
     @GetMapping("sale_info")
-    public Result getTransactionPost(@RequestBody SearchTransactionDTO searchTransactionDTO) {
+    public Result getTransactionPost(String searchContent, String campusZone, Long tagId, Long subtagId,
+                                     Integer offset, Integer limit, String type) {
+        SearchTransactionDTO searchTransactionDTO = SearchTransactionDTO.builder()
+                        .searchContent(searchContent)
+                .campusZone(campusZone)
+                .tagId(tagId)
+                .subtagId(subtagId)
+                .offset(offset)
+                .limit(limit)
+                .type(type).build();
         return transactionService.getTransactionInfoByPage(searchTransactionDTO);
     }
 

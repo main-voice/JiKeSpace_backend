@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tjsse.jikespace.entity.*;
 import com.tjsse.jikespace.entity.dto.NewTransactionDTO;
 import com.tjsse.jikespace.entity.dto.SearchTransactionDTO;
-import com.tjsse.jikespace.entity.vo.SubtagVO;
-import com.tjsse.jikespace.entity.vo.TagVO;
-import com.tjsse.jikespace.entity.vo.TransactionPageVO;
-import com.tjsse.jikespace.entity.vo.TransactionVO;
+import com.tjsse.jikespace.entity.vo.*;
 import com.tjsse.jikespace.mapper.*;
 import com.tjsse.jikespace.service.TransactionService;
 import com.tjsse.jikespace.utils.OssService;
@@ -135,7 +132,11 @@ public class TransactionServiceImpl implements TransactionService {
             BeanUtils.copyProperties(transactionPost, transactionPageVO);
             transactionPageVOList.add(transactionPageVO);
         }
-        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionPageVOList);
+
+        TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
+        transactionPagesVO.setTotal(transactionPageVOList.size());
+        transactionPagesVO.setTransactionPageVOList(transactionPageVOList);
+        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionPagesVO);
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 /**
  * @program: JiKeSpace
- * @description: vo for transaction(when query with page)
+ * @description: vo for transaction(when query with page, only show cover ana name)
  * @packagename: com.tjsse.jikespace.entity.vo
  * @author: peng peng
  * @date: 2022-12-10 16:09
