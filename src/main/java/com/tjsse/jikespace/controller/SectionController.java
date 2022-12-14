@@ -45,7 +45,7 @@ public class SectionController {
     }
 
     @GetMapping("get_posts_by_subsection")
-    public Result getPostsByTag(Integer sectionId,Integer subsectionId,Integer curPage,Integer limit){
+    public Result getPostsBySubsection(Integer sectionId,Integer subsectionId,Integer curPage,Integer limit){
         PostsWithTagDTO postsWithTagDTO = new PostsWithTagDTO((long)sectionId,(long)subsectionId,curPage,limit);
         return sectionService.getPostsByTag(postsWithTagDTO);
     }

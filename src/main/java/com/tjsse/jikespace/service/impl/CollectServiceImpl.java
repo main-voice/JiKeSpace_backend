@@ -69,7 +69,7 @@ public class CollectServiceImpl implements CollectService {
             this.collectAndSectionMapper.delete(queryWrapper);
 
             sectionService.updateSectionByCollectCount(sectionId,false);
-            return Result.success(JKCode.SUCCESS.getCode(),"已取消收藏");
+            return Result.success(JKCode.SUCCESS.getCode(),"已取消收藏",null);
         }
         else {
             CollectAndSection collectAndSection = new CollectAndSection();
@@ -78,7 +78,7 @@ public class CollectServiceImpl implements CollectService {
             this.collectAndSectionMapper.insert(collectAndSection);
 
             sectionService.updateSectionByCollectCount(sectionId,true);
-            return Result.success(20000,"收藏成功");
+            return Result.success(20000,"收藏成功",null);
         }
     }
 
@@ -104,11 +104,11 @@ public class CollectServiceImpl implements CollectService {
             collectAndPost.setUserId(userId);
             collectAndPost.setFolderId(folderId);
             collectAndPostMapper.insert(collectAndPost);
-            return Result.success(20000,"收藏成功");
+            return Result.success(20000,"收藏成功",null);
         }
         else{
             collectAndPostMapper.delete(queryWrapper);
-            return Result.success(20000,"取消收藏成功");
+            return Result.success(20000,"取消收藏成功",null);
         }
     }
 

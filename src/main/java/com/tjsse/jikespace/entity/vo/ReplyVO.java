@@ -20,7 +20,7 @@ public class ReplyVO {
     private Long replyId;
     private LocalDateTime updateTime;
     private String authorName;
-    private String reply_to;
+    private String replyTo;
     private String content;
     private Boolean ableToDelete;
 }

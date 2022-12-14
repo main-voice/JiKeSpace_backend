@@ -158,21 +158,27 @@ public class UserServiceImpl implements UserService {
         boolean matches = passwordEncoder.matches(password, password1);
         if(matches){
             if(user.getEmail()==email){
-                return Result.fail(-1,"新邮箱与原邮箱重复",null);
+                Map<String,Boolean> map= new HashMap<>();
+                map.put("result",false);
+                return Result.fail(-1,"新邮箱与原邮箱重复",map);
             }
             LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(User::getEmail,email);
             queryWrapper.eq(User::getIsDeleted,false);
             List<User> users = userMapper.selectList(queryWrapper);
             if(users.size()!=0){
-                return Result.fail(-1,"该邮箱已与其他账号绑定",null);
+                Map<String,Boolean> map= new HashMap<>();
+                map.put("result",false);
+                return Result.fail(-1,"该邮箱已与其他账号绑定",map);
             }
             user.setEmail(email);
             userMapper.updateById(user);
             return Result.success(true);
         }
         else{
-            return Result.success(false);
+            Map<String,Boolean> map= new HashMap<>();
+            map.put("result",true);
+            return Result.success(20000,"okk",map);
         }
     }
 
@@ -220,14 +226,20 @@ public class UserServiceImpl implements UserService {
         boolean matches = passwordEncoder.matches(oldPassword, password);
         if(matches){
             if ( oldPassword==newPassword){
-                return Result.fail(-1,"新密码与旧密码重复",false);
+                Map<String,Boolean> map= new HashMap<>();
+                map.put("result",false);
+                return Result.fail(-1,"新密码与旧密码重复",map);
             }
             user.setPassword(newPassword);
             userMapper.updateById(user);
-            return Result.success(20000,"okk",true);
+            Map<String,Boolean> map= new HashMap<>();
+            map.put("result",true);
+            return Result.success(20000,"okk",map);
         }
         else{
-            return Result.fail(-1,"密码错误或新密码与旧密码重复",false);
+            Map<String,Boolean> map= new HashMap<>();
+            map.put("result",false);
+            return Result.fail(-1,"密码错误或新密码与旧密码重复",map);
         }
     }
 

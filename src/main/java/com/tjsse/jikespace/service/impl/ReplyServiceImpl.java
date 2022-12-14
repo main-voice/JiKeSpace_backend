@@ -5,6 +5,7 @@ import com.tjsse.jikespace.entity.CommentAndReply;
 import com.tjsse.jikespace.entity.Reply;
 import com.tjsse.jikespace.entity.dto.ReplyOnCommentDTO;
 import com.tjsse.jikespace.entity.dto.ReplyOnReplyDTO;
+import com.tjsse.jikespace.entity.vo.ReplyVO;
 import com.tjsse.jikespace.mapper.CommentAndReplyMapper;
 import com.tjsse.jikespace.mapper.ReplyMapper;
 import com.tjsse.jikespace.service.ReplyService;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author wlf 1557177832@qq.com
@@ -37,7 +40,7 @@ public class ReplyServiceImpl implements ReplyService {
         reply.setContent(content);
         reply.setType("1");
         reply.setAuthorId(userId);
-        reply.setTo_uid(userService.findUserIdByCommentId(commentId));
+        reply.setToUid(userService.findUserIdByCommentId(commentId));
         reply.setUpdateTime(LocalDateTime.now());
         replyMapper.insert(reply);
 
@@ -59,29 +62,18 @@ public class ReplyServiceImpl implements ReplyService {
         queryWrapper.last("limit 1");
         Reply reply1 = replyMapper.selectOne(queryWrapper);
         if(reply1==null){
-            return Result.fail(-1,"回复的帖子不存在",null);
+            return Result.fail(-1,"要回复的回复不存在",null);
         }
 
         Reply reply = new Reply();
+        reply.setCommentId(reply1.getCommentId());
         reply.setParentId(replyId);
         reply.setContent(content);
         reply.setType("2");
         reply.setAuthorId(userId);
-        reply.setTo_uid(this.findUserIdByReplyId(replyId));
+        reply.setToUid(this.findUserIdByReplyId(replyId));
         reply.setUpdateTime(LocalDateTime.now());
         replyMapper.insert(reply);
-
-        LambdaQueryWrapper<CommentAndReply> queryWrapper1 = new LambdaQueryWrapper<>();
-        queryWrapper1.eq(CommentAndReply::getReplyId,replyId);
-        queryWrapper1.last("limit 1");
-        CommentAndReply commentAndReply = commentAndReplyMapper.selectOne(queryWrapper1);
-
-        CommentAndReply commentAndReply1 = new CommentAndReply();
-        commentAndReply1.setReplyId(reply.getId());
-        commentAndReply1.setCommentId(commentAndReply.getCommentId());
-        commentAndReplyMapper.insert(commentAndReply1);
-
-
 
         return Result.success(20000,"操作成功",null);
     }
@@ -103,6 +95,35 @@ public class ReplyServiceImpl implements ReplyService {
         commentAndReplyMapper.delete(queryWrapper1);
 
         return Result.success(20000,"操作成功",null);
+    }
+
+    @Override
+    public List<ReplyVO> findReplysByCommentId(Long id, Long userId) {
+        LambdaQueryWrapper<Reply> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Reply::getCommentId,id);
+        List<Reply> replies = replyMapper.selectList(queryWrapper);
+        List<ReplyVO> replyVOList = copyReplies(replies,userId);
+        return replyVOList;
+    }
+
+    private List<ReplyVO> copyReplies(List<Reply> replies,Long userId) {
+        List<ReplyVO> replyVOList = new ArrayList<>();
+        for (Reply reply :
+                replies) {
+            replyVOList.add(copy(reply,userId));
+        }
+        return replyVOList;
+    }
+
+    private ReplyVO copy(Reply reply,Long userId) {
+        ReplyVO replyVO = new ReplyVO();
+        replyVO.setReplyId(reply.getId());
+        replyVO.setReplyTo(userService.findUserById(reply.getToUid()).getUsername());
+        replyVO.setContent(reply.getContent());
+        replyVO.setAuthorName(userService.findUserById(reply.getAuthorId()).getUsername());
+        replyVO.setUpdateTime(reply.getUpdateTime());
+        replyVO.setAbleToDelete(userId == reply.getAuthorId());
+        return replyVO;
     }
 
     private Long findUserIdByReplyId(Long replyId) {

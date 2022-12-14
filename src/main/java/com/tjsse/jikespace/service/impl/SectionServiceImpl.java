@@ -9,6 +9,7 @@ import com.tjsse.jikespace.entity.dto.SectionDataDTO;
 import com.tjsse.jikespace.entity.vo.CollectSectionVO;
 import com.tjsse.jikespace.entity.vo.PostDataVO;
 import com.tjsse.jikespace.entity.vo.SectionDataVO;
+import com.tjsse.jikespace.entity.vo.SectionPostsVO;
 import com.tjsse.jikespace.mapper.CollectAndSectionMapper;
 import com.tjsse.jikespace.mapper.SectionMapper;
 import com.tjsse.jikespace.mapper.SubSectionMapper;
@@ -99,7 +100,12 @@ public class SectionServiceImpl implements SectionService {
         List<PostDataVO> postList = postService.findPostBySectionIdAndSubSectionId(sectionId, subsectionId, curPage, limit);
         if(postList.size()==0)
             return Result.fail(-1,"该子版块下没有帖子",null);
-        return Result.success(20000,postList);
+
+        SectionPostsVO sectionPostsVO = new SectionPostsVO();
+        sectionPostsVO.setPostDataVOList(postList);
+        sectionPostsVO.setTotal(section.getPostCounts());
+
+        return Result.success(20000,sectionPostsVO);
     }
 
     @Override
@@ -129,7 +135,7 @@ public class SectionServiceImpl implements SectionService {
         queryWrapper1.in(Section::getId,sectionIdList);
         List<Section> sections = sectionMapper.selectList(queryWrapper1);
 
-        return Result.success(20000,copyList(sections));
+        return Result.success(20000,"okk",copyList(sections));
     }
 
     @Override
@@ -139,7 +145,7 @@ public class SectionServiceImpl implements SectionService {
         queryWrapper.last("limit "+ i);
         List<Section> sections = sectionMapper.selectList(queryWrapper);
 
-        return Result.success(20000,copyList(sections));
+        return Result.success(20000,"okk",copyList(sections));
     }
 
     @Override
@@ -148,7 +154,7 @@ public class SectionServiceImpl implements SectionService {
         queryWrapper.orderByDesc(Section::getPostCounts);
         queryWrapper.like(Section::getSectionName,content);
         List<Section> sections = sectionMapper.selectList(queryWrapper);
-        return Result.success(20000,copyList(sections));
+        return Result.success(20000,"okk",copyList(sections));
     }
 
     @Override

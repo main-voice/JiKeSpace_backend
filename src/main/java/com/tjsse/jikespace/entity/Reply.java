@@ -30,6 +30,6 @@ public class Reply {
     private Long commentId;
     private Long parentId;
     private Long authorId;
-    private Long to_uid;
+    private Long toUid;
     private String type;
 }

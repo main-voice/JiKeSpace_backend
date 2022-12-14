@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.tjsse.jikespace.utils.JKCode.OTHER_ERROR;
@@ -144,14 +145,14 @@ public class UserController {
     }
 
     @GetMapping(value = "account/get_collect_info")
-    public Result getCollectInfo(@RequestHeader("JK-Token") String jk_token,Long fordId
+    public Result getCollectInfo(@RequestHeader("JK-Token") String jk_token,Long folderId
             ,Integer curPage, Integer limit){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.parseLong(userIdStr);
-        FolderPostDTO folderPostDTO = new FolderPostDTO(fordId,curPage,limit);
+        FolderPostDTO folderPostDTO = new FolderPostDTO(folderId,curPage,limit);
         return folderService.getCollectInfo(userId,folderPostDTO);
     }
 
@@ -179,8 +180,10 @@ public class UserController {
         User user = userInfoService.findUserById(userId);
         user.setAvatar(s);
         threadService.updateUserByAvatar(userMapper,user);
+        Map<String,String> map = new HashMap<>();
+        map.put("result",s);
 
-        return Result.success(20000,"okk",s);
+        return Result.success(20000,"okk",map);
     }
 
     @GetMapping("account/get_my_post")

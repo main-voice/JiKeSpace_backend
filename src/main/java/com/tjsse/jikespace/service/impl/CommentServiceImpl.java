@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tjsse.jikespace.entity.*;
 import com.tjsse.jikespace.entity.dto.ReplyOnPostDTO;
 import com.tjsse.jikespace.entity.vo.CommentVO;
+import com.tjsse.jikespace.entity.vo.ReplyVO;
 import com.tjsse.jikespace.mapper.CommentAndBodyMapper;
 import com.tjsse.jikespace.mapper.CommentMapper;
 import com.tjsse.jikespace.mapper.PostAndCommentMapper;
 import com.tjsse.jikespace.mapper.PostMapper;
 import com.tjsse.jikespace.service.CommentService;
 import com.tjsse.jikespace.service.PostService;
+import com.tjsse.jikespace.service.ReplyService;
 import com.tjsse.jikespace.service.UserService;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,8 @@ public class CommentServiceImpl implements CommentService {
     private PostService postService;
     @Autowired
     private PostAndCommentMapper postAndCommentMapper;
+    @Autowired
+    private ReplyService replyService;
 
     @Override
     public List<CommentVO> findCommentVOsByPostIdWithPage(Long userId,Long postId,Integer offset,Integer limit) {
@@ -48,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
         queryWrapper.eq(Comment::getIsDeleted,false);
         Page<Comment> commentPage1 = commentMapper.selectPage(commentPage,queryWrapper);
         List<Comment> records = commentPage1.getRecords();
-        List<CommentVO> commentVOList = this.copyList(records);
+        List<CommentVO> commentVOList = this.copyList(records,userId);
         for (CommentVO commentVO :
                 commentVOList) {
             String userName = userService.findUserById(userId).getUsername();
@@ -114,22 +118,26 @@ public class CommentServiceImpl implements CommentService {
         return Result.success(20000,"删除成功",null);
     }
 
-    private List<CommentVO> copyList(List<Comment> commentList) {
+    private List<CommentVO> copyList(List<Comment> commentList,Long userId) {
         List<CommentVO> commentVOList = new ArrayList<>();
         for (Comment comment :
                 commentList) {
-            commentVOList.add(copy(comment));
+            commentVOList.add(copy(comment,userId));
         }
         return commentVOList;
     }
 
-    private CommentVO copy(Comment comment) {
+    private CommentVO copy(Comment comment,Long userId) {
         CommentVO commentVO = new CommentVO();
         User user = userService.findUserById(comment.getAuthorId());
+        commentVO.setCommentId(comment.getId());
         commentVO.setAuthor(user.getUsername());
         commentVO.setAvatar(user.getAvatar());
         commentVO.setUpdateTime(comment.getUpdateTime());
         commentVO.setContent(this.findContentByBodyId(comment.getBodyId()));
+        List<ReplyVO> replyVOList = new ArrayList<>();
+        replyVOList = replyService.findReplysByCommentId(comment.getId(),userId);
+        commentVO.setReplyVOList(replyVOList);
         return commentVO;
     }
 

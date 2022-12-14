@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.tjsse.jikespace.entity.Folder;
 import com.tjsse.jikespace.entity.dto.FolderPostDTO;
 import com.tjsse.jikespace.entity.dto.RenameFolderDTO;
+import com.tjsse.jikespace.entity.vo.CollectPostsVO;
 import com.tjsse.jikespace.entity.vo.FolderPostVO;
 import com.tjsse.jikespace.entity.vo.FolderVO;
 import com.tjsse.jikespace.mapper.FolderMapper;
@@ -90,9 +91,12 @@ public class FolderServiceImpl implements FolderService {
         }
 
         List<FolderPostVO> folderPostVOList = postService.findPostsByFolderIdWithPage(folderId,curPage,limit);
+        CollectPostsVO collectPostsVO = new CollectPostsVO();
+        collectPostsVO.setFolderPostDTOList(folderPostVOList);
+        collectPostsVO.setTotal(folderPostVOList.size());
 
 
-        return Result.success(20000,"okk",folderPostVOList);
+        return Result.success(20000,"okk",collectPostsVO);
     }
 
     @Override
