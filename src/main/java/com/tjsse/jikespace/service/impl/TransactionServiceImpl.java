@@ -50,10 +50,13 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionImagesMapper transactionImagesMapper;
 
     @Autowired
-    OssService ossService;
+    private CollectAndTransactionMapper collectAndTransactionMapper;
 
     @Autowired
-    UserMapper userMapper;
+    private OssService ossService;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public Result getAllTags() {
@@ -269,5 +272,25 @@ public class TransactionServiceImpl implements TransactionService {
                 .set("is_deleted", true);
         transactionMapper.update(null, updateWrapper);
         return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), null);
+    }
+
+    @Override
+    public Result collectTransactionPost(Long userId, Long postId) {
+        QueryWrapper<CollectAndTransaction> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId)
+                .eq("transaction_post_id", postId);
+
+        CollectAndTransaction collectAndTransaction = collectAndTransactionMapper.selectOne(queryWrapper);
+        // if not exists, insert one
+        if (collectAndTransaction == null) {
+            CollectAndTransaction newCollectTransaction = new CollectAndTransaction();
+            newCollectTransaction.setTransactionPostId(postId);
+            newCollectTransaction.setUserId(userId);
+            collectAndTransactionMapper.insert(newCollectTransaction);
+            return Result.success(SUCCESS.getCode());
+        }
+        // if already exists, remove it.
+        collectAndTransactionMapper.delete(queryWrapper);
+        return Result.success(SUCCESS.getCode());
     }
 }

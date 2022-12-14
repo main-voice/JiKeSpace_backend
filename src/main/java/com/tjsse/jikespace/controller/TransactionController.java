@@ -3,6 +3,7 @@ package com.tjsse.jikespace.controller;
 import com.tjsse.jikespace.entity.dto.NewTransactionDTO;
 import com.tjsse.jikespace.entity.dto.SearchTransactionDTO;
 import com.tjsse.jikespace.service.TransactionService;
+import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.JwtUtil;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +37,8 @@ public class TransactionController {
         return transactionService.getTransactionInfoByPage(searchTransactionDTO);
     }
 
-    @GetMapping("post/{id}")
-    public Result getTransactionPostById(@PathVariable(value = "id") Long id) {
+    @GetMapping("post")
+    public Result getTransactionPostById(Long id) {
         return transactionService.getTransactionInfoById(id);
     }
 
@@ -69,9 +70,23 @@ public class TransactionController {
         return transactionService.createTransactionPost(userId, newTransactionDTO);
     }
 
-    @PostMapping("delete/")
+    @PostMapping("delete")
     public Result deleteTransactionPost(@RequestParam("id") Long id) {
         return transactionService.deleteTransactionPost(id);
+    }
+
+    @PostMapping("collect_transaction")
+    public Result collectTransaction(@RequestParam(value = "id") Long postId,
+                                     @RequestHeader(value = "JK-Token") String token) {
+        if (postId == null) {
+            Result.fail(JKCode.OTHER_ERROR.getCode(), "postId is null", null);
+        }
+        String userIdFromToken = JwtUtil.getUserIdFromToken(token);
+        if (userIdFromToken == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析用户出错", null);
+        }
+        Long userId = Long.valueOf(userIdFromToken);
+        return transactionService.collectTransactionPost(userId, postId);
     }
 
 }

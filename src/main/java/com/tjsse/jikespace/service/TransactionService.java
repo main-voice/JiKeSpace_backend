@@ -20,4 +20,6 @@ public interface TransactionService {
     Result createTransactionPost(Long authorId, NewTransactionDTO newTransactionDTO);
 
     Result deleteTransactionPost(Long id);
+
+    Result collectTransactionPost(Long userId, Long postId);
 }
