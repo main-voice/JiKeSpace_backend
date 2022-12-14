@@ -97,8 +97,8 @@ public class TransactionServiceImpl implements TransactionService {
             intType = SELL_POST.getCode();
         }
 
-        if (searchTransactionDTO.getCampus() != null) {
-            queryWrapper.eq("campus", searchTransactionDTO.getCampus());
+        if (searchTransactionDTO.getCampusZone() != null) {
+            queryWrapper.eq("campus", searchTransactionDTO.getCampusZone());
         }
         if (searchTransactionDTO.getSearchContent() != null) {
             queryWrapper.like("title", searchTransactionDTO.getSearchContent())
@@ -117,7 +117,7 @@ public class TransactionServiceImpl implements TransactionService {
         queryWrapper.eq("is_deleted", false);
 
         // 分页查询
-        Page<TransactionPost> emptyPage = new Page<>(searchTransactionDTO.getCurPage(), searchTransactionDTO.getLimit());
+        Page<TransactionPost> emptyPage = new Page<>(searchTransactionDTO.getOffset(), searchTransactionDTO.getLimit());
         Page<TransactionPost> transactionPostPage = transactionMapper.selectPage(emptyPage, queryWrapper);
 
         if (transactionPostPage.getRecords().size() == 0) {

@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SearchTransactionDTO {
     String searchContent;
-    String campus;
+    String campusZone;
     Long tagId;
     Long subtagId;
-    int curPage; // 分页查询时的起始位置
+    int offset; // 分页查询时的起始位置
     int limit;
     String type; // 交易还是求购
 }
