@@ -230,7 +230,8 @@ public class UserServiceImpl implements UserService {
                 map.put("result",false);
                 return Result.fail(-1,"新密码与旧密码重复",map);
             }
-            user.setPassword(newPassword);
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            user.setPassword(encodedPassword);
             userMapper.updateById(user);
             Map<String,Boolean> map= new HashMap<>();
             map.put("result",true);

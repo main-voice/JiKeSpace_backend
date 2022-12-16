@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author wlf 1557177832@qq.com
@@ -78,7 +80,10 @@ public class FolderServiceImpl implements FolderService {
         LambdaQueryWrapper<Folder> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Folder::getUserId,userId);
         List<Folder> folders = folderMapper.selectList(queryWrapper);
-        return Result.success(copyList(folders));
+        List<FolderVO> folderVOList = copyList(folders);
+        Map<String,Object> map = new HashMap<>();
+        map.put("folders",folderVOList);
+        return Result.success(map);
     }
 
     @Override
