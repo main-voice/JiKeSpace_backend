@@ -9,6 +9,7 @@ import com.tjsse.jikespace.entity.dto.SearchTransactionDTO;
 import com.tjsse.jikespace.entity.vo.*;
 import com.tjsse.jikespace.mapper.*;
 import com.tjsse.jikespace.service.TransactionService;
+import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.OssService;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.BeanUtils;
@@ -149,6 +150,13 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionVO transactionVO = new TransactionVO();
         BeanUtils.copyProperties(transactionPost, transactionVO);
 
+        // type
+        if (Objects.equals(transactionPost.getPostType(), SELL_POST.getCode())) {
+            transactionVO.setType("出售");
+        }
+        else if (transactionPost.getPostType() == BUY_POST.getCode()) {
+            transactionVO.setType("求购");
+        }
         // avatar and name
         User user = userMapper.selectById(transactionPost.getAuthorId());
         if (user == null || user.getIsDeleted()) {

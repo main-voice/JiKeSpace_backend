@@ -35,4 +35,6 @@ public class TransactionVO {
 
     private LocalDateTime publishTime;
     private Integer viewCounts;
+
+    private String type;
 }
