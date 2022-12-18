@@ -100,7 +100,7 @@ public class PostController {
         return replyService.replyOnReply(userId,replyOnReplyDTO);
     }
 
-    @DeleteMapping("delete_comment")
+    @DeleteMapping("comment")
     public Result deleteComment(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String ,String> map){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -114,7 +114,7 @@ public class PostController {
         return commentService.deleteComment(userId,commentId);
     }
 
-    @DeleteMapping("delete_reply")
+    @DeleteMapping("reply")
     public Result deleteReply(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String ,String> map){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
