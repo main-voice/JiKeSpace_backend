@@ -2,7 +2,6 @@ package com.tjsse.jikespace.controller;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.tjsse.jikespace.entity.Folder;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.dto.*;
 import com.tjsse.jikespace.mapper.UserMapper;

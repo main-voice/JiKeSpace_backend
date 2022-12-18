@@ -3,6 +3,7 @@ package com.tjsse.jikespace.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.mapper.UserMapper;
+import com.tjsse.jikespace.service.FolderService;
 import com.tjsse.jikespace.service.RegisterService;
 import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.Result;
@@ -20,6 +21,8 @@ public class RegisterServiceImpl implements RegisterService {
 
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    FolderService folderService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -51,7 +54,10 @@ public class RegisterServiceImpl implements RegisterService {
         if (insert == 0 || insert < 0) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户注册失败");
         }
+        else {
+            folderService.createFolder(user.getId(),"默认收藏夹");
+        }
 
-        return Result.success(null, JKCode.SUCCESS.getCode());
+        return Result.success(20000,"okk",null);
     }
 }
