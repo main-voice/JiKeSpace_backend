@@ -8,6 +8,7 @@ import com.tjsse.jikespace.entity.dto.NewTransactionDTO;
 import com.tjsse.jikespace.entity.dto.SearchTransactionDTO;
 import com.tjsse.jikespace.entity.vo.*;
 import com.tjsse.jikespace.mapper.*;
+import com.tjsse.jikespace.service.ThreadService;
 import com.tjsse.jikespace.service.TransactionService;
 import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.OssService;
@@ -55,6 +56,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    ThreadService threadService;
 
     @Override
     public Result getAllTags() {
@@ -179,15 +183,16 @@ public class TransactionServiceImpl implements TransactionService {
         }
         transactionVO.setImagesList(imagesUrl);
         // viewCounts ++
-        UpdateWrapper<TransactionPost> updateWrapperTranPostViewCount = new UpdateWrapper<>();
-        Integer viewCount = transactionVO.getViewCounts();
-        if (viewCount == null) {
-            viewCount = 0;
-        }
-        viewCount = viewCount + 1;
-        updateWrapperTranPostViewCount.eq("id", transactionPost.getId())
-                .set("view_counts", viewCount);
-        transactionMapper.update(null, updateWrapperTranPostViewCount);
+        threadService.updateViewCountOfTransactionPost(transactionMapper, transactionPost);
+//        UpdateWrapper<TransactionPost> updateWrapperTranPostViewCount = new UpdateWrapper<>();
+//        Integer viewCount = transactionVO.getViewCounts();
+//        if (viewCount == null) {
+//            viewCount = 0;
+//        }
+//        viewCount = viewCount + 1;
+//        updateWrapperTranPostViewCount.eq("id", transactionPost.getId())
+//                .set("view_counts", viewCount);
+//        transactionMapper.update(null, updateWrapperTranPostViewCount);
         return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionVO);
     }
 
