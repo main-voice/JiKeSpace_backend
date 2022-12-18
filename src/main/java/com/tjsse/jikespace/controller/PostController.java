@@ -1,5 +1,6 @@
 package com.tjsse.jikespace.controller;
 
+import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.dto.*;
 import com.tjsse.jikespace.entity.vo.PostDataVO;
 import com.tjsse.jikespace.service.CollectService;
@@ -9,10 +10,13 @@ import com.tjsse.jikespace.utils.JKCode;
 
 import com.tjsse.jikespace.service.ReplyService;
 import com.tjsse.jikespace.utils.JwtUtil;
+import com.tjsse.jikespace.utils.OssService;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,6 +29,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("post/")
 public class PostController {
+    @Autowired
+    private OssService ossService;
     @Autowired
     private PostService postService;
     @Autowired
@@ -120,6 +126,21 @@ public class PostController {
             return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg(),null);
         }
         return replyService.deleteReply(userId,replyId);
+    }
+
+    @PostMapping("upload_picture")
+    public Result uploadPicture(@RequestHeader("JK-Token") String jk_token,@RequestParam("image") MultipartFile picture){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+
+        String s = ossService.uploadFile(picture);
+        Map<String,String> map = new HashMap<>();
+        map.put("url",s);
+
+        return Result.success(20000,"okk",map);
     }
 
 

@@ -86,17 +86,19 @@ public class CollectServiceImpl implements CollectService {
     public Result collectPost(Long userId, CollectPostDTO collectPostDTO) {
         Long postId = collectPostDTO.getId();
         Long folderId = collectPostDTO.getFolderId();
-        if(postId==null||folderId==null){
+        if(postId==null&&folderId==null){
             return Result.fail(JKCode.PARAMS_ERROR.getCode(),JKCode.PARAMS_ERROR.getMsg());
         }
-
 
         LambdaQueryWrapper<CollectAndPost> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(CollectAndPost::getPostId,postId);
         queryWrapper.eq(CollectAndPost::getUserId,userId);
-        queryWrapper.eq(CollectAndPost::getFolderId,folderId);
         queryWrapper.last("limit 1");
         CollectAndPost collectAndPost1 = collectAndPostMapper.selectOne(queryWrapper);
+
+        if(collectAndPost1 == null||folderId==null){
+            return Result.fail(-1,"参数有误",null);
+        }
 
         if(collectAndPost1 == null){
             CollectAndPost collectAndPost =new CollectAndPost();
