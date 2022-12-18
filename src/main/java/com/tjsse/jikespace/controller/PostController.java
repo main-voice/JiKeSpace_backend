@@ -68,7 +68,7 @@ public class PostController {
         return commentService.replyOnPost(userId,replyOnPostDTO);
     }
 
-    @PostMapping("reply_on_comment/")
+    @PostMapping("reply_on_comment")
     public Result replyOnComment(@RequestHeader("JK-Token") String jk_token, @RequestBody ReplyOnCommentDTO replyOnCommentDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -81,7 +81,7 @@ public class PostController {
         return replyService.replyOnComment(userId,replyOnCommentDTO);
     }
 
-    @PostMapping("reply_on_reply/")
+    @PostMapping("reply_on_reply")
     public Result replyOnReply(@RequestHeader("JK-Token") String jk_token, @RequestBody ReplyOnReplyDTO replyOnReplyDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
@@ -94,7 +94,7 @@ public class PostController {
         return replyService.replyOnReply(userId,replyOnReplyDTO);
     }
 
-    @DeleteMapping("delete_comment/")
+    @DeleteMapping("delete_comment")
     public Result deleteComment(@RequestHeader("JK-Token") String jk_token, @RequestBody Map<String ,String> map){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {

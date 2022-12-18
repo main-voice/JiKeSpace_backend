@@ -3,9 +3,11 @@ package com.tjsse.jikespace.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.tjsse.jikespace.entity.Post;
 import com.tjsse.jikespace.entity.Section;
+import com.tjsse.jikespace.entity.TransactionPost;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.mapper.PostMapper;
 import com.tjsse.jikespace.mapper.SectionMapper;
+import com.tjsse.jikespace.mapper.TransactionMapper;
 import com.tjsse.jikespace.mapper.UserMapper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -29,6 +31,16 @@ public class ThreadService {
         queryWrapper.eq(Post::getId,post.getId());
         queryWrapper.eq(Post::getViewCounts,post.getViewCounts());
         postMapper.update(updatePost,queryWrapper);
+    }
+
+    @Async("threadpool")
+    public void updateViewCountOfTransactionPost(TransactionMapper transactionMapper, TransactionPost transactionPost) {
+        TransactionPost updatePost = new TransactionPost();
+        updatePost.setViewCounts(transactionPost.getViewCounts() + 1);
+        LambdaQueryWrapper<TransactionPost> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TransactionPost::getId, transactionPost.getId());
+        queryWrapper.eq(TransactionPost::getViewCounts, transactionPost.getViewCounts());
+        transactionMapper.update(updatePost, queryWrapper);
     }
 
     @Async("threadpool")
