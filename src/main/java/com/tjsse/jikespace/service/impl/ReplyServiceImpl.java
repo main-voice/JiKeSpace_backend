@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author wlf 1557177832@qq.com
@@ -122,7 +123,7 @@ public class ReplyServiceImpl implements ReplyService {
         replyVO.setContent(reply.getContent());
         replyVO.setAuthorName(userService.findUserById(reply.getAuthorId()).getUsername());
         replyVO.setUpdateTime(reply.getUpdateTime());
-        replyVO.setAbleToDelete(userId == reply.getAuthorId());
+        replyVO.setAbleToDelete(Objects.equals(userId, reply.getAuthorId()));
         return replyVO;
     }
 

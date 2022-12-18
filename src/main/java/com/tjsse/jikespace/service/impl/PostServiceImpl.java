@@ -99,7 +99,7 @@ public class PostServiceImpl implements PostService {
         postVO.setTime(post.getUpdateTime());
         postVO.setContent(this.findBodyByPostId(postId));
 
-        User user = userService.findUserById(postId);
+        User user = userService.findUserById(userId);
         postVO.setAuthor(user.getUsername());
         postVO.setAvatar(user.getAvatar());
         postVO.setBrowseNumber(post.getViewCounts());
@@ -121,7 +121,7 @@ public class PostServiceImpl implements PostService {
         }
 
         postVO.setTotal(post.getCommentCounts()+1);
-        postVO.setCommentVOList(commentService.findCommentVOsByPostIdWithPage(userId,postId,offset,limit));
+        postVO.setCommentVOList(commentService.findCommentVOsByPostIdWithPage(userId,postId,offset,limit)); //userId是发送请求的用户的id
 
         threadService.updateViewCount(postMapper,post); //通过线程池更新阅读数
 

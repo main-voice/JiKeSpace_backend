@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 评论服务类的实现类
@@ -53,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
         Page<Comment> commentPage1 = commentMapper.selectPage(commentPage,queryWrapper);
         List<Comment> records = commentPage1.getRecords();
         List<CommentVO> commentVOList = this.copyList(records,userId);
-        for (CommentVO commentVO :
+/*        for (CommentVO commentVO :
                 commentVOList) {
             String userName = userService.findUserById(userId).getUsername();
             if(commentVO.getAuthor()==null||userName == null){
@@ -62,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
             else{
                 commentVO.setAbleToDelete(commentVO.getAuthor() == userName);
             }
-        }
+        }*/
         return commentVOList;
     }
 
@@ -135,6 +136,7 @@ public class CommentServiceImpl implements CommentService {
         commentVO.setAvatar(user.getAvatar());
         commentVO.setUpdateTime(comment.getUpdateTime());
         commentVO.setContent(this.findContentByBodyId(comment.getBodyId()));
+        commentVO.setAbleToDelete(Objects.equals(comment.getAuthorId(), userId));
         List<ReplyVO> replyVOList = new ArrayList<>();
         replyVOList = replyService.findReplysByCommentId(comment.getId(),userId);
         commentVO.setReplyVOList(replyVOList);
