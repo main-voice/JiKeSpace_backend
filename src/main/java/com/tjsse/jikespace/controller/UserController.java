@@ -167,8 +167,7 @@ public class UserController {
     }
 
     @PostMapping("account/change_avatar")
-    public Result changeAvatar(@RequestHeader("JK-Token") String jk_token
-            ,@RequestHeader("Content-Type") String type,@RequestParam("Avatar") MultipartFile avatar){
+    public Result changeAvatar(@RequestHeader("JK-Token") String jk_token,@RequestParam("Avatar") MultipartFile avatar){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
