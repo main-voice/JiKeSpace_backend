@@ -52,7 +52,7 @@ public class ThreadService {
             updateSection.setPostCounts(section.getPostCounts()+1);
         }
         else{
-            updateSection.setUserCounts(section.getPostCounts()-1);
+            updateSection.setPostCounts(section.getPostCounts()-1);
         }
         LambdaQueryWrapper<Section> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Section::getId,section.getId());
@@ -73,6 +73,7 @@ public class ThreadService {
         postMapper.update(updatePost,queryWrapper);
     }
 
+    @Async("threadpool")
     public void updateUserByAvatar(UserMapper userMapper, User user) {
         userMapper.updateById(user);
     }

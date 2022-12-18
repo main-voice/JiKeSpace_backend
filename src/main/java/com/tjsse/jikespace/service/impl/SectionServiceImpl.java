@@ -166,7 +166,7 @@ public class SectionServiceImpl implements SectionService {
     @Override
     public void updateSectionByPostCount(Long sectionId, boolean b) {
         Section section = this.findSectionById(sectionId);
-        threadService.updateSectionByPostCount(sectionMapper,section,true);
+        threadService.updateSectionByPostCount(sectionMapper,section,b);
     }
 
     private List<CollectSectionVO> copyList(List<Section> sections) {

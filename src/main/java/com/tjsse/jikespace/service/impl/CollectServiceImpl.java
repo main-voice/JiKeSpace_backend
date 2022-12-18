@@ -37,7 +37,7 @@ public class CollectServiceImpl implements CollectService {
     @Override
     public Boolean isUserCollectPost(Long userId, Long postId) {
         LambdaQueryWrapper<CollectAndPost> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(CollectAndPost::getId,postId);
+        queryWrapper.eq(CollectAndPost::getPostId,postId);
         queryWrapper.eq(CollectAndPost::getUserId,userId);
         queryWrapper.last("limit 1");
         if(collectAndPostMapper.selectOne(queryWrapper)==null)
@@ -96,7 +96,7 @@ public class CollectServiceImpl implements CollectService {
         queryWrapper.last("limit 1");
         CollectAndPost collectAndPost1 = collectAndPostMapper.selectOne(queryWrapper);
 
-        if(collectAndPost1 == null||folderId==null){
+        if(collectAndPost1 == null&&folderId==null){
             return Result.fail(-1,"参数有误",null);
         }
 

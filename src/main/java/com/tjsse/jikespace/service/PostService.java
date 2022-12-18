@@ -27,4 +27,6 @@ public interface PostService {
     List<FolderPostVO> findPostsByFolderIdWithPage(Long folderId,Integer curPage,Integer limit);
 
     Result findPostsByUserIdWithPage(Long userId, String type, Integer curPage, Integer limit);
+
+    Result deleteMyPost(Long postId, Long userId);
 }

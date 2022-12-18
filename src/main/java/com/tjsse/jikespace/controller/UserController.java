@@ -31,6 +31,8 @@ public class UserController {
     @Autowired
     private UserService userInfoService;
     @Autowired
+    private StudentService studentService;
+    @Autowired
     private PostService postService;
     @Autowired
     private OssService ossService;
@@ -184,6 +186,18 @@ public class UserController {
         return Result.success(20000,"okk",map);
     }
 
+    @PostMapping("account/apply_to_student")
+    public Result applyToStudent(@RequestHeader("JK-Token") String jk_token,@RequestParam("cardPicture") MultipartFile avatar
+    ,@RequestParam("studentId") Integer studentId){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        String s = ossService.uploadFile(avatar);
+        return studentService.applyToStudent(userId,s,studentId);
+    }
+
     @GetMapping("account/get_my_post")
     public Result getMyPost(@RequestHeader("JK-Token") String jk_token,String type,Integer curPage,Integer limit){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
@@ -192,6 +206,17 @@ public class UserController {
         }
         Long userId = Long.valueOf(userIdStr);
         return  postService.findPostsByUserIdWithPage(userId,type,curPage,limit);
+    }
+
+    @DeleteMapping("account/delete_my_post")
+    public Result deleteMyPost(@RequestHeader("JK-Token") String jk_token,@RequestBody Map<String,Long> map){
+        Long postId = map.get("postId");
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        return postService.deleteMyPost(postId,userId);
     }
 
 }

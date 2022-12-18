@@ -5,9 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tjsse.jikespace.entity.*;
 import com.tjsse.jikespace.entity.dto.PostDataDTO;
 import com.tjsse.jikespace.entity.dto.PostPublishDTO;
-import com.tjsse.jikespace.entity.vo.FolderPostVO;
-import com.tjsse.jikespace.entity.vo.PostDataVO;
-import com.tjsse.jikespace.entity.vo.PostVO;
+import com.tjsse.jikespace.entity.vo.*;
 import com.tjsse.jikespace.mapper.PostAndBodyMapper;
 import com.tjsse.jikespace.mapper.PostMapper;
 import com.tjsse.jikespace.service.*;
@@ -187,7 +185,54 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Result findPostsByUserIdWithPage(Long userId, String type, Integer curPage, Integer limit) {
-        return null;
+        Page<Post> postPage = new Page<>(curPage,limit);
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Post::getIsDeleted,false);
+        queryWrapper.eq(Post::getAuthorId,userId);
+        queryWrapper.eq(Post::getPostType,"交流贴");
+        Page<Post> postPage1 = postMapper.selectPage(postPage, queryWrapper);
+        List<Post> postList = postPage1.getRecords();
+        MyPostVO myPostVO = new MyPostVO();
+        myPostVO.setTotal(postList.size());
+        myPostVO.setMyPosts(copyToMyPosts(postList));
+        return Result.success(20000,"okk",myPostVO);
+    }
+
+    @Override
+    public Result deleteMyPost(Long postId, Long userId) {
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Post::getId,postId);
+        queryWrapper.eq(Post::getAuthorId,userId);
+        queryWrapper.eq(Post::getIsDeleted,false);
+        Post post = postMapper.selectOne(queryWrapper);
+        if(post==null){
+            return Result.fail(-1,"参数有误",null);
+        }
+        else{
+            post.setIsDeleted(true);
+            postMapper.updateById(post);
+            sectionService.updateSectionByPostCount(post.getSectionId(),false);
+            return Result.success(20000,"okk",null);
+        }
+    }
+
+    private List<MyPostContentVO> copyToMyPosts(List<Post> postList) {
+        List<MyPostContentVO> myPostContentVOS = new ArrayList<>();
+        for (Post post :
+                postList) {
+            myPostContentVOS.add(copyToMyPost(post));
+        }
+        return myPostContentVOS;
+    }
+
+    private MyPostContentVO copyToMyPost(Post post) {
+        MyPostContentVO myPostContentVO = new MyPostContentVO();
+        myPostContentVO.setPostId(post.getId());
+        myPostContentVO.setTitle(post.getTitle());
+        myPostContentVO.setUpdateTime(post.getUpdateTime().toString());
+        myPostContentVO.setSectionName(sectionService.findSectionById(post.getSectionId()).getSectionName());
+        myPostContentVO.setCommentCount(post.getCommentCounts());
+        return myPostContentVO;
     }
 
     private Post findPostById(Long postId) {
