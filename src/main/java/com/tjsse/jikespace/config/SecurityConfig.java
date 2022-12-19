@@ -55,7 +55,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/forget-pwd",
                 "/user/send-email-code",
                 "/section/get_section_data",
-                "/section/get_posts_by_subsection");
+                "/section/get_posts_by_subsection",
+                "/homepage/hot_section",
+                "/homepage/search_section",
+                "/homepage/news",
+                "/homepage/hot_post");
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
