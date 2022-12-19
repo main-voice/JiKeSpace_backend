@@ -56,6 +56,8 @@ public class RegisterServiceImpl implements RegisterService {
         }
         else {
             folderService.createFolder(user.getId(),"默认收藏夹");
+            user.setNickname("用户"+user.getId().toString());
+            userMapper.updateById(user);
         }
 
         return Result.success(20000,"okk",null);
