@@ -108,6 +108,7 @@ public class UserServiceImpl implements UserService {
     public Long findUserIdByCommentId(Long commentId) {
         LambdaQueryWrapper<Comment> queryWrapper =new LambdaQueryWrapper<>();
         queryWrapper.eq(Comment::getId,commentId);
+        queryWrapper.eq(Comment::getIsDeleted,false);
         queryWrapper.last("limit 1");
         Comment comment = commentMapper.selectOne(queryWrapper);
         return comment.getAuthorId();

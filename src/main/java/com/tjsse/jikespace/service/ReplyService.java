@@ -2,6 +2,7 @@ package com.tjsse.jikespace.service;
 
 import com.tjsse.jikespace.entity.dto.ReplyOnCommentDTO;
 import com.tjsse.jikespace.entity.dto.ReplyOnReplyDTO;
+import com.tjsse.jikespace.entity.vo.MyReplyVO;
 import com.tjsse.jikespace.entity.vo.ReplyVO;
 import com.tjsse.jikespace.utils.Result;
 
@@ -15,4 +16,6 @@ public interface ReplyService {
     Result deleteReply(Long userId, Long replyId);
 
     List<ReplyVO> findReplysByCommentId(Long id,Long userId);
+
+    List<MyReplyVO> findRepliesByUserId(Long userId);
 }

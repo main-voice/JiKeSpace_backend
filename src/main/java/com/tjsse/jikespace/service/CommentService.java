@@ -3,6 +3,7 @@ package com.tjsse.jikespace.service;
 import com.tjsse.jikespace.entity.Comment;
 import com.tjsse.jikespace.entity.dto.ReplyOnPostDTO;
 import com.tjsse.jikespace.entity.vo.CommentVO;
+import com.tjsse.jikespace.entity.vo.MyReplyVO;
 import com.tjsse.jikespace.utils.Result;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface CommentService {
     Result replyOnPost(Long userId, ReplyOnPostDTO replyOnPostDTO);
 
     Result deleteComment(Long userId, Long commentId);
+
+    List<MyReplyVO> findCommentsByUserId(Long userId);
 }

@@ -29,4 +29,6 @@ public interface PostService {
     Result findPostsByUserIdWithPage(Long userId, String type, Integer curPage, Integer limit);
 
     Result deleteMyPost(Long postId, Long userId);
+
+    List<Long> findPostIdsByUserId(Long userId);
 }

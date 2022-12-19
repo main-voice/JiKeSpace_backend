@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tjsse.jikespace.entity.*;
 import com.tjsse.jikespace.entity.dto.ReplyOnPostDTO;
 import com.tjsse.jikespace.entity.vo.CommentVO;
+import com.tjsse.jikespace.entity.vo.MyReplyVO;
 import com.tjsse.jikespace.entity.vo.ReplyVO;
 import com.tjsse.jikespace.mapper.CommentAndBodyMapper;
 import com.tjsse.jikespace.mapper.CommentMapper;
@@ -117,6 +118,35 @@ public class CommentServiceImpl implements CommentService {
 
         postService.updatePostByCommentCount(comment.getPostId(),false);
         return Result.success(20000,"删除成功",null);
+    }
+
+    @Override
+    public List<MyReplyVO> findCommentsByUserId(Long userId) {
+        List<Long> postIds = postService.findPostIdsByUserId(userId);
+        LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Comment::getIsDeleted,false);
+        queryWrapper.in(Comment::getPostId,postIds);
+        List<Comment> commentList = commentMapper.selectList(queryWrapper);
+        List<MyReplyVO> myReplyVOList = copyMyComments(commentList);
+        return myReplyVOList;
+    }
+
+    private List<MyReplyVO> copyMyComments(List<Comment> commentList) {
+        List<MyReplyVO> myReplyVOList = new ArrayList<>();
+        for (Comment comment :
+                commentList) {
+            myReplyVOList.add(copyMyComment(comment));
+        }
+        return myReplyVOList;
+    }
+
+    private MyReplyVO copyMyComment(Comment comment) {
+        MyReplyVO myReplyVO = new MyReplyVO();
+        myReplyVO.setId(comment.getId());
+        myReplyVO.setTime(comment.getUpdateTime());
+        myReplyVO.setType("Comment");
+        myReplyVO.setContent(this.findContentByBodyId(comment.getBodyId()));
+        return myReplyVO;
     }
 
     private List<CommentVO> copyList(List<Comment> commentList,Long userId) {

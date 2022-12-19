@@ -179,6 +179,7 @@ public class PostServiceImpl implements PostService {
         Page<Post> postPage = new Page<>(curPage,limit);
         LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.in(Post::getId,postIds);
+        queryWrapper.eq(Post::getIsDeleted,false);
         Page<Post> postPage1 = postMapper.selectPage(postPage, queryWrapper);
         return copyListFolder(postPage1.getRecords());
     }
@@ -216,6 +217,20 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    @Override
+    public List<Long> findPostIdsByUserId(Long userId) {
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Post::getAuthorId,userId);
+        queryWrapper.eq(Post::getIsDeleted,false);
+        List<Post> postList = postMapper.selectList(queryWrapper);
+        List<Long> postIds = new ArrayList<>();
+        for (Post post :
+                postList) {
+            postIds.add(post.getId());
+        }
+        return postIds;
+    }
+
     private List<MyPostContentVO> copyToMyPosts(List<Post> postList) {
         List<MyPostContentVO> myPostContentVOS = new ArrayList<>();
         for (Post post :
@@ -248,6 +263,7 @@ public class PostServiceImpl implements PostService {
     public Result hotPost() {
         LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.orderByDesc(Post::getCommentCounts);
+        queryWrapper.eq(Post::getIsDeleted,false);
         queryWrapper.last("limit 10");
         List<Post> postList = postMapper.selectList(queryWrapper);
         return Result.success(copyList(postList));
@@ -257,6 +273,7 @@ public class PostServiceImpl implements PostService {
     public Result getNews() {
         LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Post::getSectionId,1);
+        queryWrapper.eq(Post::getIsDeleted,false);
         queryWrapper.orderByDesc(Post::getCommentCounts);
         queryWrapper.last("limit 10");
         List<Post> postList = postMapper.selectList(queryWrapper);

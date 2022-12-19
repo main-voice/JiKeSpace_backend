@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.dto.*;
+import com.tjsse.jikespace.entity.vo.MyReplyVO;
 import com.tjsse.jikespace.mapper.UserMapper;
 import com.tjsse.jikespace.service.*;
 import com.tjsse.jikespace.utils.*;
@@ -12,7 +13,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.tjsse.jikespace.utils.JKCode.OTHER_ERROR;
@@ -41,6 +44,10 @@ public class UserController {
     EmailService emailService;
     @Autowired
     private  FolderService folderService;
+    @Autowired
+    private ReplyService replyService;
+    @Autowired
+    private CommentService commentService;
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
@@ -217,6 +224,23 @@ public class UserController {
         }
         Long userId = Long.valueOf(userIdStr);
         return postService.deleteMyPost(postId,userId);
+    }
+
+    @GetMapping("get_my_reply")
+    public Result getMyReply(@RequestHeader("JK-Token") String jk_token){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+
+        List<MyReplyVO> myReplyVOList1 = replyService.findRepliesByUserId(userId);
+        List<MyReplyVO> myReplyVOList2 = commentService.findCommentsByUserId(userId);
+
+        myReplyVOList1.addAll(myReplyVOList2);
+        myReplyVOList1.sort((t1,t2)->t2.getTime().compareTo(t1.getTime()));
+
+        return Result.success(20000,"okk",myReplyVOList1);
     }
 
 }

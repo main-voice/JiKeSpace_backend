@@ -5,6 +5,7 @@ import com.tjsse.jikespace.entity.CommentAndReply;
 import com.tjsse.jikespace.entity.Reply;
 import com.tjsse.jikespace.entity.dto.ReplyOnCommentDTO;
 import com.tjsse.jikespace.entity.dto.ReplyOnReplyDTO;
+import com.tjsse.jikespace.entity.vo.MyReplyVO;
 import com.tjsse.jikespace.entity.vo.ReplyVO;
 import com.tjsse.jikespace.mapper.CommentAndReplyMapper;
 import com.tjsse.jikespace.mapper.ReplyMapper;
@@ -105,6 +106,33 @@ public class ReplyServiceImpl implements ReplyService {
         List<Reply> replies = replyMapper.selectList(queryWrapper);
         List<ReplyVO> replyVOList = copyReplies(replies,userId);
         return replyVOList;
+    }
+
+    @Override
+    public List<MyReplyVO> findRepliesByUserId(Long userId) {
+        LambdaQueryWrapper<Reply> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Reply::getToUid,userId);
+        List<Reply> replies = replyMapper.selectList(queryWrapper);
+        List<MyReplyVO> myReplyVOList = copyMyReplies(replies);
+        return myReplyVOList;
+    }
+
+    private List<MyReplyVO> copyMyReplies(List<Reply> replies) {
+        List<MyReplyVO> myReplyVOList = new ArrayList<>();
+        for (Reply reply :
+                replies) {
+            myReplyVOList.add(copyMyReply(reply));
+        }
+        return myReplyVOList;
+    }
+
+    private MyReplyVO copyMyReply(Reply reply) {
+        MyReplyVO myReplyVO = new MyReplyVO();
+        myReplyVO.setTime(reply.getUpdateTime());
+        myReplyVO.setId(reply.getId());
+        myReplyVO.setType("Reply");
+        myReplyVO.setContent(reply.getContent());
+        return myReplyVO;
     }
 
     private List<ReplyVO> copyReplies(List<Reply> replies,Long userId) {
