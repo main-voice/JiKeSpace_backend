@@ -1,7 +1,10 @@
 package com.tjsse.jikespace.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.dto.*;
 import com.tjsse.jikespace.entity.vo.MyReplyVO;
@@ -10,13 +13,12 @@ import com.tjsse.jikespace.service.*;
 import com.tjsse.jikespace.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.tjsse.jikespace.utils.JKCode.OTHER_ERROR;
 import static com.tjsse.jikespace.utils.JKCode.PARAMS_ERROR;
@@ -227,7 +229,7 @@ public class UserController {
     }
 
     @GetMapping("get_my_reply")
-    public Result getMyReply(@RequestHeader("JK-Token") String jk_token){
+    public Result getMyReply(@RequestHeader("JK-Token") String jk_token,Integer offset,Integer limit){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
@@ -240,7 +242,12 @@ public class UserController {
         myReplyVOList1.addAll(myReplyVOList2);
         myReplyVOList1.sort((t1,t2)->t2.getTime().compareTo(t1.getTime()));
 
-        return Result.success(20000,"okk",myReplyVOList1);
+        Set<MyReplyVO> collect = myReplyVOList1.stream()
+                .skip((offset - 1) * limit)
+                .limit(limit)
+                .collect(Collectors.toSet());
+
+        return Result.success(20000,"okk",collect);
     }
 
 }
