@@ -22,7 +22,7 @@ public class SectionAndSubSection {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private Long section_id;
+    private Long sectionId;
 
-    private Long subsection_id;
+    private Long subsectionId;
 }
