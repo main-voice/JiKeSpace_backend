@@ -189,7 +189,6 @@ public class UserServiceImpl implements UserService {
 
         UserDataVO userVO = new UserDataVO();
         BeanUtils.copyProperties(user,userVO);
-        userVO.setIsStudent(user.getStudentId()!=null);
         return Result.success(20000,"okk",userVO);
     }
 
