@@ -309,6 +309,7 @@ public class SectionServiceImpl implements SectionService {
 
     private MySectionsVO copyToMySection(Section section) {
         MySectionsVO mySectionsVO = new MySectionsVO();
+        mySectionsVO.setSectionId(section.getId());
         mySectionsVO.setSectionAvatar(section.getSectionAvatar());
         mySectionsVO.setSectionName(section.getSectionName());
         mySectionsVO.setUserCounts(section.getUserCounts());

@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MySectionsVO {
+    private Long sectionId;
     private String sectionName;
     private String sectionAvatar;
     private Integer postCounts;
