@@ -94,6 +94,14 @@ public class FolderServiceImpl implements FolderService {
         if(folderId==null||curPage==null||limit==null){
             return Result.fail(-1,"参数有误",null);
         }
+        if(folderId==0){
+            LambdaQueryWrapper<Folder> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(Folder::getUserId,userId);
+            queryWrapper.orderByAsc(Folder::getId);
+            queryWrapper.last("limit 1");
+            Folder folder = folderMapper.selectOne(queryWrapper);
+            folderId = folder.getId();
+        }
 
         List<FolderPostVO> folderPostVOList = postService.findPostsByFolderIdWithPage(folderId,curPage,limit);
         CollectPostsVO collectPostsVO = new CollectPostsVO();

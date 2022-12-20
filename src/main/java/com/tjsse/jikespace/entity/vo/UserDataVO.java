@@ -20,5 +20,5 @@ public class UserDataVO {
     private String gender;
     private String phoneNumber;
     private String avatar;
-    private Boolean isStudent;
+    private String studentId;
 }
