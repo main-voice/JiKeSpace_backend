@@ -41,7 +41,7 @@ public class PostController {
     private CollectService collectService;
 
     @GetMapping("post_data")
-    public Result getPostData(@RequestHeader("JK-Token") String jk_token,Integer id,Integer offset,Integer limit){
+    public Result getPostData(@RequestHeader(value = "JK-Token", required = false) String jk_token,Integer id,Integer offset,Integer limit){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);

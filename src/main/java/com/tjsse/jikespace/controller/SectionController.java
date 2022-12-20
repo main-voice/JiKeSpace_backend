@@ -34,7 +34,7 @@ public class SectionController {
     private PostService postService;
 
     @GetMapping("get_section_data")
-    public Result getSectionData(@RequestHeader("JK-Token") String jk_token,Integer sectionId,Integer curPage,Integer limit){
+    public Result getSectionData(@RequestHeader(value = "JK-Token", required = false) String jk_token,Integer sectionId,Integer curPage,Integer limit){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);

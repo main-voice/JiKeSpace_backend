@@ -59,7 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/homepage/hot_section",
                 "/homepage/search_section",
                 "/homepage/news",
-                "/homepage/hot_post");
+                "/homepage/hot_post",
+                "/post/post_data");
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
