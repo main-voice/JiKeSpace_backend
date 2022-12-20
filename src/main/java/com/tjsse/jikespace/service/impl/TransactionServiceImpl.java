@@ -307,4 +307,68 @@ public class TransactionServiceImpl implements TransactionService {
         collectAndTransactionMapper.delete(queryWrapper);
         return Result.success(SUCCESS.getCode());
     }
+
+    @Override
+    public Result getUserSellTrans(Long userId, Integer offset, Integer limit) {
+        QueryWrapper<TransactionPost> queryWrapper = new QueryWrapper<>();
+        Integer intType = SELL_POST.getCode();
+
+        queryWrapper.eq("post_type", intType)
+                .eq("is_deleted", false)
+                .eq("author_id", userId);
+
+        // 分页查询
+        Page<TransactionPost> emptyPage = new Page<>(offset, limit);
+        Page<TransactionPost> transactionPostPage = transactionMapper.selectPage(emptyPage, queryWrapper);
+
+        if (transactionPostPage.getRecords().size() == 0) {
+            return Result.fail(OTHER_ERROR.getCode(), "交易贴为空或者查询出错", null);
+        }
+
+        // 查询后转为VO返回给前端
+        List<TransactionPageVO> transactionPageVOList = new ArrayList<>();
+        for (TransactionPost transactionPost : transactionPostPage.getRecords())
+        {
+            TransactionPageVO transactionPageVO = new TransactionPageVO();
+            BeanUtils.copyProperties(transactionPost, transactionPageVO);
+            transactionPageVOList.add(transactionPageVO);
+        }
+
+        TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
+        transactionPagesVO.setTotal(transactionPageVOList.size());
+        transactionPagesVO.setTransactionPageVOList(transactionPageVOList);
+        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionPagesVO);
+    }
+
+    @Override
+    public Result getUserSeekTrans(Long userId, Integer offset, Integer limit) {
+        QueryWrapper<TransactionPost> queryWrapper = new QueryWrapper<>();
+        Integer intType = BUY_POST.getCode();
+
+        queryWrapper.eq("post_type", intType)
+                .eq("is_deleted", false)
+                .eq("author_id", userId);
+
+        // 分页查询
+        Page<TransactionPost> emptyPage = new Page<>(offset, limit);
+        Page<TransactionPost> transactionPostPage = transactionMapper.selectPage(emptyPage, queryWrapper);
+
+        if (transactionPostPage.getRecords().size() == 0) {
+            return Result.fail(OTHER_ERROR.getCode(), "交易贴为空或者查询出错", null);
+        }
+
+        // 查询后转为VO返回给前端
+        List<TransactionPageVO> transactionPageVOList = new ArrayList<>();
+        for (TransactionPost transactionPost : transactionPostPage.getRecords())
+        {
+            TransactionPageVO transactionPageVO = new TransactionPageVO();
+            BeanUtils.copyProperties(transactionPost, transactionPageVO);
+            transactionPageVOList.add(transactionPageVO);
+        }
+
+        TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
+        transactionPagesVO.setTotal(transactionPageVOList.size());
+        transactionPagesVO.setTransactionPageVOList(transactionPageVOList);
+        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionPagesVO);
+    }
 }

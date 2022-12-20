@@ -22,4 +22,8 @@ public interface TransactionService {
     Result deleteTransactionPost(Long id);
 
     Result collectTransactionPost(Long userId, Long postId);
+
+    Result getUserSellTrans(Long userId, Integer offset, Integer limit);
+    Result getUserSeekTrans(Long userId, Integer offset, Integer limit);
+
 }

@@ -58,6 +58,9 @@ public class UserController {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private TransactionService transactionService;
+
     @GetMapping("info")
     public Result getUserInfo(@RequestHeader("JK-Token") String token) {
         return userInfoService.getUserInfo(token);
@@ -250,5 +253,37 @@ public class UserController {
         return Result.success(20000,"okk",collect);
     }
 
+    @PostMapping("account/delete_transaction_post")
+    public Result deleteTransactionPost(@RequestHeader("JK-Token") String jk_token,
+                                        @RequestParam(value = "transactionId") Long Id) {
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        return transactionService.deleteTransactionPost(Id);
+    }
+
+    @GetMapping("account/get_my_sell_transaction")
+    public Result getUserSellTransaction(@RequestHeader(value = "JK-Token") String jk_token,
+                                         Integer offset, Integer limit) {
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        return transactionService.getUserSellTrans(userId, offset, limit);
+    }
+
+    @GetMapping("account/get_my_seek_transaction")
+    public Result getUserSeekTransaction(@RequestHeader(value = "JK-Token") String jk_token,
+                                         Integer offset, Integer limit) {
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        return transactionService.getUserSeekTrans(userId, offset, limit);
+    }
 }
 
