@@ -1,10 +1,8 @@
 package com.tjsse.jikespace.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.tjsse.jikespace.entity.Section;
 import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.dto.*;
 import com.tjsse.jikespace.entity.vo.MyReplyVO;
@@ -13,7 +11,6 @@ import com.tjsse.jikespace.service.*;
 import com.tjsse.jikespace.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +32,8 @@ import static com.tjsse.jikespace.utils.JKCode.PARAMS_ERROR;
 public class UserController {
     @Autowired
     private UserService userInfoService;
+    @Autowired
+    private SectionService sectionService;
     @Autowired
     private StudentService studentService;
     @Autowired
@@ -246,8 +245,82 @@ public class UserController {
                 .skip((offset - 1) * limit)
                 .limit(limit)
                 .collect(Collectors.toSet());
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("total",collect.size());
+        map.put("myReply",collect);
+        return Result.success(20000,"okk",map);
+    }
 
-        return Result.success(20000,"okk",collect);
+    @GetMapping("account/get_user_sections")
+    public Result getUserSections(@RequestHeader("JK-Token") String jk_token){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        return sectionService.getUserSections(userId);
+    }
+
+    @PostMapping("account/create_section")
+    public Result createSection(@RequestHeader("JK-Token") String jk_token,@RequestParam("sectionName") String sectionName
+            ,@RequestParam("sectionAvatar") MultipartFile image,@RequestParam("sectionIntro") String sectionIntro
+    ,@RequestParam("subsections") String[] subsection){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        String s = ossService.uploadFile(image);
+        return sectionService.createSection(userId,sectionName,s,sectionIntro,subsection);
+    }
+
+    @PostMapping("account/add_subsection")
+    public Result addSubSection(@RequestHeader("JK-Token") String jk_token,@RequestBody AddSubSectionDTO addSubSectionDTO){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        Long sectionId = addSubSectionDTO.getSectionId();
+        Section sectionById = sectionService.findSectionById(sectionId);
+        if(Objects.equals(sectionById.getAdminId(), userId)){
+            return sectionService.addSubSection(addSubSectionDTO);
+        }
+        return Result.fail(-1,"该用户没有此权限",null);
+    }
+
+    @DeleteMapping("account/delete_subsection")
+    public Result deleteSubSection(@RequestHeader("JK-Token") String jk_token,@RequestBody Map<String,Integer> map){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        Integer subsectionId = map.get("subsectionId");
+        return sectionService.deleteSubSection(userId,subsectionId);
+    }
+
+    @PostMapping("account/rename_subsection")
+    public Result renameSubSection(@RequestHeader("JK-Token") String jk_token,@RequestBody RenameSubSectionDTO renameSubSectionDTO){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        renameSubSectionDTO.setUserId(userId);
+        return sectionService.renameSubSection(renameSubSectionDTO);
+    }
+
+    @PostMapping("account/change_section_avatar")
+    public Result changeSectionAvatar(@RequestHeader("JK-Token") String jk_token,@RequestParam("sectionId") Long sectionId
+            ,@RequestParam("avatar") MultipartFile image){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        String avatar = ossService.uploadFile(image);
+        return sectionService.changeSectionAvatar(userId,sectionId,avatar);
     }
 
 }

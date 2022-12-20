@@ -3,14 +3,15 @@ package com.tjsse.jikespace.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.tjsse.jikespace.entity.CollectAndSection;
 import com.tjsse.jikespace.entity.Section;
+import com.tjsse.jikespace.entity.SectionAndSubSection;
 import com.tjsse.jikespace.entity.SubSection;
+import com.tjsse.jikespace.entity.dto.AddSubSectionDTO;
 import com.tjsse.jikespace.entity.dto.PostsWithTagDTO;
+import com.tjsse.jikespace.entity.dto.RenameSubSectionDTO;
 import com.tjsse.jikespace.entity.dto.SectionDataDTO;
-import com.tjsse.jikespace.entity.vo.CollectSectionVO;
-import com.tjsse.jikespace.entity.vo.PostDataVO;
-import com.tjsse.jikespace.entity.vo.SectionDataVO;
-import com.tjsse.jikespace.entity.vo.SectionPostsVO;
+import com.tjsse.jikespace.entity.vo.*;
 import com.tjsse.jikespace.mapper.CollectAndSectionMapper;
+import com.tjsse.jikespace.mapper.SectionAndSubSectionMapper;
 import com.tjsse.jikespace.mapper.SectionMapper;
 import com.tjsse.jikespace.mapper.SubSectionMapper;
 import com.tjsse.jikespace.service.*;
@@ -18,9 +19,9 @@ import com.tjsse.jikespace.utils.Result;
 import com.tjsse.jikespace.utils.JKCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 版块服务的实现
@@ -35,6 +36,8 @@ public class SectionServiceImpl implements SectionService {
     private SectionMapper sectionMapper;
     @Autowired
     private SubSectionMapper subSectionMapper;
+    @Autowired
+    private SectionAndSubSectionMapper sectionAndSubSectionMapper;
     @Autowired
     private CollectAndSectionMapper collectAndSectionMapper;
     @Autowired
@@ -167,6 +170,151 @@ public class SectionServiceImpl implements SectionService {
     public void updateSectionByPostCount(Long sectionId, boolean b) {
         Section section = this.findSectionById(sectionId);
         threadService.updateSectionByPostCount(sectionMapper,section,b);
+    }
+
+    @Override
+    public Result getUserSections(Long userId) {
+        LambdaQueryWrapper<Section> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Section::getAdminId,userId);
+        queryWrapper.eq(Section::getIsDeleted,false);
+        List<Section> sections = sectionMapper.selectList(queryWrapper);
+        List<MySectionsVO> mySectionsVOList = copyToMySectionsVO(sections);
+        Map<String,Object> map = new HashMap<>();
+        map.put("sectionInfo",mySectionsVOList);
+        return Result.success(map);
+    }
+
+    @Override
+    public Result addSubSection(AddSubSectionDTO addSubSectionDTO) {
+        String name = addSubSectionDTO.getName();
+        Long sectionId = addSubSectionDTO.getSectionId();
+        List<SubSection> subSectionList = findSubSectionBySectionId(sectionId);
+        for (SubSection subsection :
+                subSectionList) {
+            if (Objects.equals(name, subsection.getName())){
+                return Result.fail(-1,"名字不能与该版块下其他子版块名重复",null);
+            }
+        }
+        SubSection subSection = new SubSection();
+        subSection.setName(name);
+        subSectionMapper.insert(subSection);
+
+        SectionAndSubSection sectionAndSubSection = new SectionAndSubSection();
+        sectionAndSubSection.setSectionId(sectionId);
+        sectionAndSubSection.setSubsectionId(subSection.getId());
+        sectionAndSubSectionMapper.insert(sectionAndSubSection);
+
+        return Result.success(20000,"okk",null);
+    }
+
+    @Override
+    public Result createSection(Long userId, String sectionName, String image, String sectionIntro, String[] subsection) {
+        LambdaQueryWrapper<Section> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Section::getSectionName,sectionName);
+        queryWrapper.eq(Section::getIsDeleted,false);
+        queryWrapper.last("limit 1");
+        Section section = sectionMapper.selectOne(queryWrapper);
+        if(section!=null){
+            return Result.fail(-1,"论坛里已有该版块",null);
+        }
+        Section section1 = new Section();
+        section1.setSectionName(sectionName);
+        section1.setSectionAvatar(image);
+        section1.setSectionSummary(sectionIntro);
+        section1.setAdminId(userId);
+        sectionMapper.insert(section1);
+        for(int i=0;i<subsection.length;i++){
+            AddSubSectionDTO addSubSectionDTO = new AddSubSectionDTO(section1.getId(),subsection[i]);
+            this.addSubSection(addSubSectionDTO);
+        }
+        return Result.success(20000,"okk",null);
+    }
+
+    @Override
+    public Result deleteSubSection(Long userId, Integer subsectionId) {
+        LambdaQueryWrapper<SectionAndSubSection> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SectionAndSubSection::getSubsectionId,subsectionId);
+        queryWrapper.last("limit 1");
+        SectionAndSubSection sectionAndSubSection = sectionAndSubSectionMapper.selectOne(queryWrapper);
+        LambdaQueryWrapper<Section> queryWrapper1 = new LambdaQueryWrapper<>();
+        queryWrapper1.eq(Section::getId,sectionAndSubSection.getSectionId());
+        queryWrapper.last("limit 1");
+        Section section = sectionMapper.selectOne(queryWrapper1);
+        if(!Objects.equals(userId, section.getAdminId())){
+            return Result.fail(-1,"没有权限",null);
+        }
+        sectionAndSubSectionMapper.deleteById(sectionAndSubSection);
+        LambdaQueryWrapper<SubSection> queryWrapper2 = new LambdaQueryWrapper<>();
+        queryWrapper2.eq(SubSection::getId,subsectionId);
+        queryWrapper2.last("limit 1");
+        subSectionMapper.delete(queryWrapper2);
+        return Result.success(20000,"okk",null);
+    }
+
+    @Override
+    public Result renameSubSection(RenameSubSectionDTO renameSubSectionDTO) {
+        Long userId = renameSubSectionDTO.getUserId();
+        Long subsectionId = renameSubSectionDTO.getSubsectionId();
+        String name = renameSubSectionDTO.getName();
+
+        LambdaQueryWrapper<SectionAndSubSection> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SectionAndSubSection::getSubsectionId,subsectionId);
+        queryWrapper.last("limit 1");
+        SectionAndSubSection sectionAndSubSection = sectionAndSubSectionMapper.selectOne(queryWrapper);
+
+        LambdaQueryWrapper<Section> queryWrapper1 = new LambdaQueryWrapper<>();
+        queryWrapper1.eq(Section::getId,sectionAndSubSection.getSectionId());
+        queryWrapper.last("limit 1");
+        Section section = sectionMapper.selectOne(queryWrapper1);
+
+        if(!Objects.equals(userId, section.getAdminId())){
+            return Result.fail(-1,"没有权限",null);
+        }
+        List<SubSection> subSections = this.findSubSectionBySectionId(section.getId());
+        for (SubSection sub :
+                subSections) {
+            if(name==sub.getName()){
+                return Result.fail(-1,"名字不能与该版块下其他子版块名重复",null);
+            }
+        }
+        LambdaQueryWrapper<SubSection> queryWrapper2 = new LambdaQueryWrapper<>();
+        queryWrapper2.eq(SubSection::getId,subsectionId);
+        queryWrapper2.last("limit 1");
+        SubSection subSection = subSectionMapper.selectOne(queryWrapper2);
+        subSection.setName(name);
+        subSectionMapper.updateById(subSection);
+
+        return Result.success(20000,"okk",null);
+    }
+
+    @Override
+    public Result changeSectionAvatar(Long userId, Long sectionId, String avatar) {
+        Section section = this.findSectionById(sectionId);
+        if(!Objects.equals(userId, section.getAdminId())){
+            return Result.fail(-1,"没有权限",null);
+        }
+
+        return null;
+    }
+
+
+    private List<MySectionsVO> copyToMySectionsVO(List<Section> sections) {
+        List<MySectionsVO> mySectionsVOList = new ArrayList<>();
+        for (Section section :
+                sections) {
+            mySectionsVOList.add(copyToMySection(section));
+        }
+        return mySectionsVOList;
+    }
+
+    private MySectionsVO copyToMySection(Section section) {
+        MySectionsVO mySectionsVO = new MySectionsVO();
+        mySectionsVO.setSectionAvatar(section.getSectionAvatar());
+        mySectionsVO.setSectionName(section.getSectionName());
+        mySectionsVO.setUserCounts(section.getUserCounts());
+        mySectionsVO.setPostCounts(section.getPostCounts());
+        mySectionsVO.setSubSectionList(findSubSectionBySectionId(section.getId()));
+        return mySectionsVO;
     }
 
     private List<CollectSectionVO> copyList(List<Section> sections) {
