@@ -298,8 +298,11 @@ public class SectionServiceImpl implements SectionService {
         if(!Objects.equals(userId, section.getAdminId())){
             return Result.fail(-1,"没有权限",null);
         }
-
-        return null;
+        else {
+            section.setSectionAvatar(avatar);
+            sectionMapper.updateById(section);
+            return Result.success(20000,"okk",null);
+        }
     }
 
 
