@@ -113,6 +113,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<MyReplyVO> findCommentsByUserId(Long userId) {
         List<Long> postIds = postService.findPostIdsByUserId(userId);
+        if(postIds.size()==0){
+            List<MyReplyVO> myReplyVOList = new ArrayList<>();
+            return myReplyVOList;
+        }
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Comment::getIsDeleted,false);
         queryWrapper.in(Comment::getPostId,postIds);
