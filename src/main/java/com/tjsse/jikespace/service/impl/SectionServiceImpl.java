@@ -52,7 +52,7 @@ public class SectionServiceImpl implements SectionService {
         Integer curPage = sectionDataDTO.getCurPage();
         Integer limit = sectionDataDTO.getLimit();
 
-        if(sectionId==null||userId==null||curPage==null||limit==null)
+        if(sectionId==null||curPage==null||limit==null)
             return Result.fail(JKCode.PARAMS_ERROR.getCode(), JKCode.PARAMS_ERROR.getMsg(),null);
 
         Section section = this.findSectionById(sectionId);
@@ -62,12 +62,17 @@ public class SectionServiceImpl implements SectionService {
         SectionDataVO sectionDataVO = new SectionDataVO();
         sectionDataVO.setSectionName(section.getSectionName());
         sectionDataVO.setPostCounts(section.getPostCounts());
-        sectionDataVO.setIsCollected(collectService.isUserCollectSection(userId,sectionId));
+        if(userId!=null){
+            sectionDataVO.setIsCollected(collectService.isUserCollectSection(userId,sectionId));
+        }
+        else{
+            sectionDataVO.setIsCollected(false);
+        }
         sectionDataVO.setSectionSummary(section.getSectionSummary());
         sectionDataVO.setSubSectionList(this.findSubSectionBySectionId(sectionId));
         sectionDataVO.setPostVOList(postService.findPostBySectionIdWithPage(sectionId,curPage,limit));
 
-        return Result.success(20000,sectionDataVO);
+        return Result.success(20000,"okk",sectionDataVO);
     }
 
     @Override

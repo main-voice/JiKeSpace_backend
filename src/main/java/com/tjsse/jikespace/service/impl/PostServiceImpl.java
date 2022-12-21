@@ -91,7 +91,13 @@ public class PostServiceImpl implements PostService {
         PostVO postVO = new PostVO();
 
         postVO.setTitle(post.getTitle());
-        postVO.setIsCollected(collectService.isUserCollectPost(userId,postId));
+        if(userId!=null){
+            postVO.setIsCollected(collectService.isUserCollectPost(userId,postId));
+        }
+        else{
+            postVO.setIsCollected(false);
+        }
+
         postVO.setSectionId(post.getSectionId());
 
         Section section = sectionService.findSectionById(post.getSectionId());
@@ -99,7 +105,8 @@ public class PostServiceImpl implements PostService {
         postVO.setTime(post.getUpdateTime());
         postVO.setContent(this.findBodyByPostId(postId));
 
-        User user = userService.findUserById(userId);
+        Post post1 = this.findPostById(postId);
+        User user = userService.findUserById(post1.getAuthorId());
         postVO.setAuthor(user.getUsername());
         postVO.setAvatar(user.getAvatar());
         postVO.setBrowseNumber(post.getViewCounts());

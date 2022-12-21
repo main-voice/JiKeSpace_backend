@@ -55,16 +55,6 @@ public class CommentServiceImpl implements CommentService {
         Page<Comment> commentPage1 = commentMapper.selectPage(commentPage,queryWrapper);
         List<Comment> records = commentPage1.getRecords();
         List<CommentVO> commentVOList = this.copyList(records,userId);
-/*        for (CommentVO commentVO :
-                commentVOList) {
-            String userName = userService.findUserById(userId).getUsername();
-            if(commentVO.getAuthor()==null||userName == null){
-                commentVO.setAbleToDelete(false);
-            }
-            else{
-                commentVO.setAbleToDelete(commentVO.getAuthor() == userName);
-            }
-        }*/
         return commentVOList;
     }
 

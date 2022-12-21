@@ -31,4 +31,5 @@ public interface UserService {
     Result editUserInfo(Long userId, UserInfoDTO userInfoDTO);
 
     Result editPassword(Long userId, PasswordDTO passwordDTO);
+
 }

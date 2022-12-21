@@ -42,12 +42,12 @@ public class PostController {
 
     @GetMapping("post_data")
     public Result getPostData(@RequestHeader(value = "JK-Token", required = false) String jk_token,Integer id,Integer offset,Integer limit){
+        PostDataDTO postDataDTO = new PostDataDTO((long)id,offset,limit);
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return postService.getPostData(null,postDataDTO);
         }
         Long userId = Long.parseLong(userIdStr);
-        PostDataDTO postDataDTO = new PostDataDTO((long)id,offset,limit);
         return postService.getPostData(userId,postDataDTO);
     }
 
