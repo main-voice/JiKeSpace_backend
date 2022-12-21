@@ -18,6 +18,7 @@ import java.util.List;
 public class MySectionsVO {
     private Long sectionId;
     private String sectionName;
+    private String sectionIntro;
     private String sectionAvatar;
     private Integer postCounts;
     private Integer userCounts;

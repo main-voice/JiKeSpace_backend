@@ -314,6 +314,7 @@ public class SectionServiceImpl implements SectionService {
         mySectionsVO.setSectionName(section.getSectionName());
         mySectionsVO.setUserCounts(section.getUserCounts());
         mySectionsVO.setPostCounts(section.getPostCounts());
+        mySectionsVO.setSectionIntro(section.getSectionSummary());
         mySectionsVO.setSubSectionList(findSubSectionBySectionId(section.getId()));
         return mySectionsVO;
     }

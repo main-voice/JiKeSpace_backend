@@ -24,10 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.tjsse.jikespace.utils.JKCode.*;
 
@@ -158,7 +155,7 @@ public class UserServiceImpl implements UserService {
         String password1 = user.getPassword();
         boolean matches = passwordEncoder.matches(password, password1);
         if(matches){
-            if(user.getEmail()==email){
+            if(Objects.equals(user.getEmail(), email)){
                 Map<String,Boolean> map= new HashMap<>();
                 map.put("result",false);
                 return Result.fail(-1,"新邮箱与原邮箱重复",map);
@@ -174,12 +171,14 @@ public class UserServiceImpl implements UserService {
             }
             user.setEmail(email);
             userMapper.updateById(user);
-            return Result.success(true);
-        }
-        else{
             Map<String,Boolean> map= new HashMap<>();
             map.put("result",true);
             return Result.success(20000,"okk",map);
+        }
+        else{
+            Map<String,Boolean> map= new HashMap<>();
+            map.put("result",false);
+            return Result.success(20000,"密码错误",map);
         }
     }
 
