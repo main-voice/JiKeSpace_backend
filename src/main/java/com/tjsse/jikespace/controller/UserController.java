@@ -358,5 +358,16 @@ public class UserController {
         Long userId = Long.valueOf(userIdStr);
         return transactionService.getUserSeekTrans(userId, offset, limit);
     }
+
+    @GetMapping("account/get_my_collect_transaction")
+    public Result getMyCollectTransaction(@RequestHeader(value = "JK-Token") String jk_token,
+                                          Integer offset, Integer limit) {
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        return transactionService.getMyCollectTransaction(userId, offset, limit);
+    }
 }
 

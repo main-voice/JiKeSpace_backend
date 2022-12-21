@@ -26,4 +26,5 @@ public interface TransactionService {
     Result getUserSellTrans(Long userId, Integer offset, Integer limit);
     Result getUserSeekTrans(Long userId, Integer offset, Integer limit);
 
+    Result getMyCollectTransaction(Long userId, Integer offset, Integer limit);
 }

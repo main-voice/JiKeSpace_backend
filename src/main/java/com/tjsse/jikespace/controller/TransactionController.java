@@ -1,7 +1,10 @@
 package com.tjsse.jikespace.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tjsse.jikespace.entity.User;
 import com.tjsse.jikespace.entity.dto.NewTransactionDTO;
 import com.tjsse.jikespace.entity.dto.SearchTransactionDTO;
+import com.tjsse.jikespace.mapper.UserMapper;
 import com.tjsse.jikespace.service.TransactionService;
 import com.tjsse.jikespace.utils.JKCode;
 import com.tjsse.jikespace.utils.JwtUtil;
@@ -27,27 +30,57 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @GetMapping("tag")
-    public Result getAllTags() {
+    public Result getAllTags(@RequestHeader(value = "JK-Token") String token) {
+        if (!checkStudent(token)) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
+        }
         return transactionService.getAllTags();
     }
 
     @GetMapping("sale_info")
-    public Result getTransactionPost(String searchContent, String campusZone, Long tagId, Long subtagId,
+    public Result getTransactionPost(@RequestHeader(value = "JK-Token") String token,
+                                     String searchContent, String campusZone, Long tagId, Long subtagId,
                                      Integer offset, Integer limit, String type) {
-        SearchTransactionDTO searchTransactionDTO = SearchTransactionDTO.builder()
-                        .searchContent(searchContent)
-                .campusZone(campusZone)
-                .tagId(tagId)
-                .subtagId(subtagId)
-                .offset(offset)
-                .limit(limit)
-                .type(type).build();
+        if (!checkStudent(token)) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
+        }
+
+        SearchTransactionDTO searchTransactionDTO = new SearchTransactionDTO();
+        if (searchContent != null) {
+            searchTransactionDTO.setSearchContent(searchContent);
+        }
+        if (campusZone != null) {
+            searchTransactionDTO.setCampusZone(campusZone);
+        }
+        if (tagId != null) {
+            searchTransactionDTO.setTagId(tagId);
+        }
+        if (subtagId != null) {
+            searchTransactionDTO.setSubtagId(subtagId);
+        }
+        if (offset != null) {
+            searchTransactionDTO.setOffset(offset);
+        }
+        if (limit != null) {
+            searchTransactionDTO.setLimit(limit);
+        }
+        if (type != null) {
+            searchTransactionDTO.setType(type);
+        }
+
         return transactionService.getTransactionInfoByPage(searchTransactionDTO);
     }
 
     @GetMapping("post")
-    public Result getTransactionPostById(Long id) {
+    public Result getTransactionPostById(@RequestHeader(value = "JK-Token") String token,
+                                         Long id) {
+        if (!checkStudent(token)) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
+        }
         return transactionService.getTransactionInfoById(id);
     }
 
@@ -64,6 +97,9 @@ public class TransactionController {
                                            @RequestParam("image")MultipartFile[] multipartFiles,
                                            @RequestHeader("JK-Token") String token)
     {
+        if (!checkStudent(token)) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
+        }
         NewTransactionDTO newTransactionDTO = NewTransactionDTO.builder()
                 .type(type)
                 .title(title)
@@ -80,13 +116,20 @@ public class TransactionController {
     }
 
     @PostMapping("delete")
-    public Result deleteTransactionPost(@RequestParam("id") Long id) {
+    public Result deleteTransactionPost(@RequestHeader(value = "JK-Token") String token,
+                                        @RequestParam("id") Long id) {
+        if (!checkStudent(token)) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
+        }
         return transactionService.deleteTransactionPost(id);
     }
 
     @PostMapping("collect_transaction")
     public Result collectTransaction(@RequestParam(value = "id") Long postId,
                                      @RequestHeader(value = "JK-Token") String token) {
+        if (!checkStudent(token)) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
+        }
         if (postId == null) {
             Result.fail(JKCode.OTHER_ERROR.getCode(), "postId is null", null);
         }
@@ -98,4 +141,16 @@ public class TransactionController {
         return transactionService.collectTransactionPost(userId, postId);
     }
 
+    boolean checkStudent(String token) {
+        String userIdFromToken = JwtUtil.getUserIdFromToken(token);
+        assert userIdFromToken != null;
+        Long userId = Long.parseLong(userIdFromToken);
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", userId);
+        User user = userMapper.selectOne(queryWrapper);
+        if (user.getStudentId() != null) {
+            return true;
+        }
+        return false;
+    }
 }
