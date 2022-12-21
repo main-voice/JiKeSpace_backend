@@ -101,26 +101,8 @@ public class TransactionServiceImpl implements TransactionService {
         } else if (Objects.equals(type, "sell")){
             intType = SELL_POST.getCode();
         }
-        System.out.println(intType);
+//        System.out.println(intType);
 
-//        if (searchTransactionDTO.getCampusZone() != null) {
-//            queryWrapper.eq("campus", searchTransactionDTO.getCampusZone());
-//        }
-//        if (searchTransactionDTO.getSearchContent() != null) {
-//            queryWrapper.like("title", searchTransactionDTO.getSearchContent())
-//                    .or()
-//                    .like("summary", searchTransactionDTO.getSearchContent());
-//        }
-//        if (searchTransactionDTO.getType() != null) {
-//            queryWrapper.eq("post_type", intType);
-//        }
-//        if (searchTransactionDTO.getTagId() != null) {
-//            queryWrapper.eq("tag_id", searchTransactionDTO.getTagId());
-//        }
-//        if (searchTransactionDTO.getSubtagId() != null) {
-//            queryWrapper.eq("subtag_id", searchTransactionDTO.getSubtagId());
-//        }
-//        queryWrapper.eq("is_deleted", false);
         System.out.println(searchTransactionDTO.getCampusZone());
         queryWrapper.eq(searchTransactionDTO.getType() != null, "post_type", intType)
                 .like(searchTransactionDTO.getCampusZone() != null, "campus", searchTransactionDTO.getCampusZone())
@@ -163,7 +145,13 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionVO transactionVO = new TransactionVO();
         BeanUtils.copyProperties(transactionPost, transactionVO);
         // TODO : add tagName and subtagName
+        Integer tagId = transactionPost.getTagId();
+        Tag tag = tagMapper.selectById(tagId);
+        transactionVO.setTagName(tag.getTagName());
 
+        Integer subtagId = transactionPost.getSubtagId();
+        Subtag subtag = subtagMapper.selectById(subtagId);
+        transactionVO.setSubtagName(subtag.getSubtagName());
         // type
         if (Objects.equals(transactionPost.getPostType(), SELL_POST.getCode())) {
             transactionVO.setType("出售");
