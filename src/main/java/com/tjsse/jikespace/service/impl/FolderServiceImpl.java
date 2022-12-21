@@ -106,7 +106,13 @@ public class FolderServiceImpl implements FolderService {
         List<FolderPostVO> folderPostVOList = postService.findPostsByFolderIdWithPage(folderId,curPage,limit);
         CollectPostsVO collectPostsVO = new CollectPostsVO();
         collectPostsVO.setFolderPostDTOList(folderPostVOList);
-        collectPostsVO.setTotal(folderPostVOList.size());
+        if(folderPostVOList!=null){
+            collectPostsVO.setTotal(folderPostVOList.size());
+        }
+        else{
+            collectPostsVO.setTotal(0);
+        }
+
 
 
         return Result.success(20000,"okk",collectPostsVO);
