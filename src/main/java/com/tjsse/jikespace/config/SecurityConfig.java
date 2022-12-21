@@ -1,12 +1,15 @@
 package com.tjsse.jikespace.config;
 
 import com.tjsse.jikespace.config.filter.JwtAuthenticationTokenFilter;
+import com.tjsse.jikespace.mapper.AdminMapper;
+import com.tjsse.jikespace.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,8 +29,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
-    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    private UserMapper userMapper;
+    @Autowired
+    private AdminMapper adminMapper;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,16 +47,36 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers(
+                "/admin/login",
+                "/user/login",
+                "/user/register",
+                "/user/forget-pwd",
+                "/user/send-email-code",
+                "/section/get_section_data",
+                "/section/get_posts_by_subsection",
+                "/homepage/hot_section",
+                "/homepage/search_section",
+                "/homepage/news",
+                "/homepage/hot_post",
+                "/post/post_data");
+    }
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/user/login/", "/user/register/").permitAll()
+//                .antMatchers("/admin/login/", "/user/login/", "/user/register/").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest()
                 .authenticated();
 
-        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    private JwtAuthenticationTokenFilter authenticationTokenFilterBean() {
+        return new JwtAuthenticationTokenFilter(userMapper, adminMapper);
     }
 }

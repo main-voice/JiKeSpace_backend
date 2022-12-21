@@ -28,7 +28,7 @@ public class Result {
     public static Result success() {
         Result result = new Result();
         result.setSuccess(true);
-        result.setCode(StatusCode.SUCCESS.getCode());
+        result.setCode(JKCode.SUCCESS.getCode());
         result.setMsg("");
         result.setData(null);
         return result;
@@ -37,7 +37,7 @@ public class Result {
     public static Result success(Object data) {
         Result result = new Result();
         result.setSuccess(true);
-        result.setCode(StatusCode.SUCCESS.getCode());
+        result.setCode(JKCode.SUCCESS.getCode());
         result.setMsg("");
         result.setData(data);
         return result;

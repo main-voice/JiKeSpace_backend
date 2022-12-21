@@ -1,4 +1,4 @@
-package com.tjsse.jikespace.controller.user;
+package com.tjsse.jikespace.controller;
 
 import com.tjsse.jikespace.entity.dto.UserDTO;
 import com.tjsse.jikespace.service.RegisterService;
@@ -23,7 +23,7 @@ public class RegisterController {
     @Autowired
     private RegisterService registerService;
 
-    @PostMapping("register/")
+    @PostMapping("register")
     public Result registerUser(@RequestBody UserDTO userDTO) {
 
         String username = userDTO.getUsername();
