@@ -144,7 +144,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         TransactionVO transactionVO = new TransactionVO();
         BeanUtils.copyProperties(transactionPost, transactionVO);
-        // TODO : add tagName and subtagName
         Integer tagId = transactionPost.getTagId();
         Tag tag = tagMapper.selectById(tagId);
         transactionVO.setTagName(tag.getTagName());

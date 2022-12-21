@@ -117,40 +117,6 @@ public class TransactionController {
         return transactionService.createTransactionPost(userId, newTransactionDTO);
     }
 
-//    @PostMapping("publish")
-//    public Result createNewTransactionPost(@RequestParam("type") String type,
-//                                           @RequestParam("title") String title,
-//                                           @RequestParam("price") Integer price,
-//                                           @RequestParam("tagId") Integer tagId,
-//                                           @RequestParam("subtagId") Integer subtagId,
-//                                           @RequestParam("content") String content,
-//                                           @RequestParam("campusZone") String campus,
-//                                           @RequestParam("contactType") String contactType,
-//                                           @RequestParam("contactNumber") String contactNumber,
-//                                           @RequestParam("image")MultipartFile multipartFile,
-//                                           @RequestHeader("JK-Token") String token)
-//    {
-//        if (!checkStudent(token)) {
-//            return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
-//        }
-//        NewTransactionDTO newTransactionDTO = NewTransactionDTO.builder()
-//                .type(type)
-//                .title(title)
-//                .price(price)
-//                .tagId(tagId)
-//                .subtagId(subtagId)
-//                .content(content)
-//                .campus(campus)
-//                .contactType(contactType)
-//                .contactNumber(contactNumber)
-//                .build();
-//        MultipartFile[] list = new MultipartFile[1];
-//        list[0] = multipartFile;
-//        newTransactionDTO.setMultipartFiles(list);
-//        Long userId = Long.valueOf(Objects.requireNonNull(JwtUtil.getUserIdFromToken(token)));
-//        return transactionService.createTransactionPost(userId, newTransactionDTO);
-//    }
-
     @PostMapping("delete")
     public Result deleteTransactionPost(@RequestHeader(value = "JK-Token") String token,
                                         @RequestParam("id") Long id) {
