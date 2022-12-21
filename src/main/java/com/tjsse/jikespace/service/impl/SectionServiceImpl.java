@@ -103,8 +103,6 @@ public class SectionServiceImpl implements SectionService {
         }
 
         List<PostDataVO> postList = postService.findPostBySectionIdAndSubSectionId(sectionId, subsectionId, curPage, limit);
-        if(postList.size()==0)
-            return Result.fail(-1,"该子版块下没有帖子",null);
 
         SectionPostsVO sectionPostsVO = new SectionPostsVO();
         sectionPostsVO.setPostDataVOList(postList);

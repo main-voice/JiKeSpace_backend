@@ -188,7 +188,8 @@ public class PostServiceImpl implements PostService {
         queryWrapper.in(Post::getId,postIds);
         queryWrapper.eq(Post::getIsDeleted,false);
         Page<Post> postPage1 = postMapper.selectPage(postPage, queryWrapper);
-        return copyListFolder(postPage1.getRecords());
+        List<Post> records = postPage1.getRecords();
+        return copyListFolder(records);
     }
 
     @Override
