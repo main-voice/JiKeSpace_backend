@@ -2,10 +2,7 @@ package com.tjsse.jikespace.service;
 
 import com.tjsse.jikespace.entity.Section;
 import com.tjsse.jikespace.entity.SubSection;
-import com.tjsse.jikespace.entity.dto.AddSubSectionDTO;
-import com.tjsse.jikespace.entity.dto.PostsWithTagDTO;
-import com.tjsse.jikespace.entity.dto.RenameSubSectionDTO;
-import com.tjsse.jikespace.entity.dto.SectionDataDTO;
+import com.tjsse.jikespace.entity.dto.*;
 import com.tjsse.jikespace.utils.Result;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,5 +43,5 @@ public interface SectionService {
 
     Result addSubSection(AddSubSectionDTO addSubSectionDTO);
 
-    Result changeSectionIntro(Long userId, Long sectionId, String sectionIntro);
+    Result changeSectionIntro(Long userId, ChangeIntroDTO changeIntroDTO);
 }

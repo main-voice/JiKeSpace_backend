@@ -5,10 +5,7 @@ import com.tjsse.jikespace.entity.CollectAndSection;
 import com.tjsse.jikespace.entity.Section;
 import com.tjsse.jikespace.entity.SectionAndSubSection;
 import com.tjsse.jikespace.entity.SubSection;
-import com.tjsse.jikespace.entity.dto.AddSubSectionDTO;
-import com.tjsse.jikespace.entity.dto.PostsWithTagDTO;
-import com.tjsse.jikespace.entity.dto.RenameSubSectionDTO;
-import com.tjsse.jikespace.entity.dto.SectionDataDTO;
+import com.tjsse.jikespace.entity.dto.*;
 import com.tjsse.jikespace.entity.vo.*;
 import com.tjsse.jikespace.mapper.CollectAndSectionMapper;
 import com.tjsse.jikespace.mapper.SectionAndSubSectionMapper;
@@ -219,7 +216,9 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    public Result changeSectionIntro(Long userId, Long sectionId, String sectionIntro) {
+    public Result changeSectionIntro(Long userId, ChangeIntroDTO changeIntroDTO) {
+        Long sectionId = changeIntroDTO.getSectionId();
+        String sectionIntro = changeIntroDTO.getSectionIntro();
         Section section = this.findSectionById(sectionId);
         if(!Objects.equals(userId, section.getAdminId())){
             return Result.fail(-1,"没有权限",null);

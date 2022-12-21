@@ -359,14 +359,14 @@ public class UserController {
         return transactionService.getUserSeekTrans(userId, offset, limit);
     }
 
-    @GetMapping("account/change_section_intro")
-    public Result changeSectionIntro(@RequestHeader(value = "JK-Token") String jk_token,Integer sectionId,String sectionIntro){
+    @PostMapping("account/change_section_intro")
+    public Result changeSectionIntro(@RequestHeader(value = "JK-Token") String jk_token,@RequestBody ChangeIntroDTO changeIntroDTO){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.valueOf(userIdStr);
-        return sectionService.changeSectionIntro(userId,(long)sectionId,sectionIntro);
+        return sectionService.changeSectionIntro(userId,changeIntroDTO);
     }
 }
 
