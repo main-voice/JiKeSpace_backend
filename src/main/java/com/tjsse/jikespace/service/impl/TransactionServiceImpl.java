@@ -101,25 +101,33 @@ public class TransactionServiceImpl implements TransactionService {
         } else if (Objects.equals(type, "sell")){
             intType = SELL_POST.getCode();
         }
+        System.out.println(intType);
 
-        if (searchTransactionDTO.getCampusZone() != null) {
-            queryWrapper.eq("campus", searchTransactionDTO.getCampusZone());
-        }
-        if (searchTransactionDTO.getSearchContent() != null) {
-            queryWrapper.like("title", searchTransactionDTO.getSearchContent())
-                    .or()
-                    .like("summary", searchTransactionDTO.getSearchContent());
-        }
-        if (searchTransactionDTO.getType() != null) {
-            queryWrapper.eq("post_type", intType);
-        }
-        if (searchTransactionDTO.getTagId() != null) {
-            queryWrapper.eq("tag_id", searchTransactionDTO.getTagId());
-        }
-        if (searchTransactionDTO.getSubtagId() != null) {
-            queryWrapper.eq("subtag_id", searchTransactionDTO.getSubtagId());
-        }
-        queryWrapper.eq("is_deleted", false);
+//        if (searchTransactionDTO.getCampusZone() != null) {
+//            queryWrapper.eq("campus", searchTransactionDTO.getCampusZone());
+//        }
+//        if (searchTransactionDTO.getSearchContent() != null) {
+//            queryWrapper.like("title", searchTransactionDTO.getSearchContent())
+//                    .or()
+//                    .like("summary", searchTransactionDTO.getSearchContent());
+//        }
+//        if (searchTransactionDTO.getType() != null) {
+//            queryWrapper.eq("post_type", intType);
+//        }
+//        if (searchTransactionDTO.getTagId() != null) {
+//            queryWrapper.eq("tag_id", searchTransactionDTO.getTagId());
+//        }
+//        if (searchTransactionDTO.getSubtagId() != null) {
+//            queryWrapper.eq("subtag_id", searchTransactionDTO.getSubtagId());
+//        }
+//        queryWrapper.eq("is_deleted", false);
+        System.out.println(searchTransactionDTO.getCampusZone());
+        queryWrapper.eq(searchTransactionDTO.getType() != null, "post_type", intType)
+                .like(searchTransactionDTO.getCampusZone() != null, "campus", searchTransactionDTO.getCampusZone())
+                .like(searchTransactionDTO.getSearchContent() != null, "title", searchTransactionDTO.getSearchContent())
+                .eq(searchTransactionDTO.getTagId() != null, "tag_id", searchTransactionDTO.getTagId())
+                .eq(searchTransactionDTO.getSubtagId() != null, "subtag_id", searchTransactionDTO.getSubtagId())
+                .eq("is_deleted", false);
 
         TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
         List<TransactionPost> list = transactionMapper.selectList(queryWrapper);
@@ -154,6 +162,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         TransactionVO transactionVO = new TransactionVO();
         BeanUtils.copyProperties(transactionPost, transactionVO);
+        // TODO : add tagName and subtagName
 
         // type
         if (Objects.equals(transactionPost.getPostType(), SELL_POST.getCode())) {
@@ -173,7 +182,11 @@ public class TransactionServiceImpl implements TransactionService {
         QueryWrapper<TransactionAndBody> postAndBodyQueryWrapper = new QueryWrapper<>();
         postAndBodyQueryWrapper.eq("transaction_id", transactionPost.getId());
         // multi records are queried.
-        String content = transactionAndBodyMapper.selectOne(postAndBodyQueryWrapper).getContent();
+        TransactionAndBody transactionAndBody = transactionAndBodyMapper.selectOne(postAndBodyQueryWrapper);
+        if (transactionAndBody == null) {
+            return Result.fail(OTHER_ERROR.getCode(), "获取交易贴内容时失败，为空", null);
+        }
+        String content = transactionAndBody.getContent();
         transactionVO.setContent(content);
         // images
         QueryWrapper<TransactionImages> transactionImagesQueryWrapper = new QueryWrapper<>();

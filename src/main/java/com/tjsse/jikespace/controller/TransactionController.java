@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -43,7 +45,7 @@ public class TransactionController {
 
     @GetMapping("sale_info")
     public Result getTransactionPost(@RequestHeader(value = "JK-Token") String token,
-                                     String searchContent, String campusZone, Long tagId, Long subtagId,
+                                     String searchContent, String campus, Long tagId, Long subtagId,
                                      Integer offset, Integer limit, String type) {
         if (!checkStudent(token)) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
@@ -53,8 +55,8 @@ public class TransactionController {
         if (searchContent != null) {
             searchTransactionDTO.setSearchContent(searchContent);
         }
-        if (campusZone != null) {
-            searchTransactionDTO.setCampusZone(campusZone);
+        if (campus != null) {
+            searchTransactionDTO.setCampusZone(campus);
         }
         if (tagId != null) {
             searchTransactionDTO.setTagId(tagId);
@@ -114,6 +116,40 @@ public class TransactionController {
         Long userId = Long.valueOf(Objects.requireNonNull(JwtUtil.getUserIdFromToken(token)));
         return transactionService.createTransactionPost(userId, newTransactionDTO);
     }
+
+//    @PostMapping("publish")
+//    public Result createNewTransactionPost(@RequestParam("type") String type,
+//                                           @RequestParam("title") String title,
+//                                           @RequestParam("price") Integer price,
+//                                           @RequestParam("tagId") Integer tagId,
+//                                           @RequestParam("subtagId") Integer subtagId,
+//                                           @RequestParam("content") String content,
+//                                           @RequestParam("campusZone") String campus,
+//                                           @RequestParam("contactType") String contactType,
+//                                           @RequestParam("contactNumber") String contactNumber,
+//                                           @RequestParam("image")MultipartFile multipartFile,
+//                                           @RequestHeader("JK-Token") String token)
+//    {
+//        if (!checkStudent(token)) {
+//            return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
+//        }
+//        NewTransactionDTO newTransactionDTO = NewTransactionDTO.builder()
+//                .type(type)
+//                .title(title)
+//                .price(price)
+//                .tagId(tagId)
+//                .subtagId(subtagId)
+//                .content(content)
+//                .campus(campus)
+//                .contactType(contactType)
+//                .contactNumber(contactNumber)
+//                .build();
+//        MultipartFile[] list = new MultipartFile[1];
+//        list[0] = multipartFile;
+//        newTransactionDTO.setMultipartFiles(list);
+//        Long userId = Long.valueOf(Objects.requireNonNull(JwtUtil.getUserIdFromToken(token)));
+//        return transactionService.createTransactionPost(userId, newTransactionDTO);
+//    }
 
     @PostMapping("delete")
     public Result deleteTransactionPost(@RequestHeader(value = "JK-Token") String token,
