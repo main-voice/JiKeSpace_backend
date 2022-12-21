@@ -34,7 +34,7 @@ public interface SectionService {
 
     Result getUserSections(Long userId);
 
-    Result addSubSection(AddSubSectionDTO addSubSectionDTO);
+
 
     Result createSection(Long userId, String sectionName, String s, String sectionIntro, String[] subsection);
 
@@ -43,4 +43,8 @@ public interface SectionService {
     Result renameSubSection(RenameSubSectionDTO renameSubSectionDTO);
 
     Result changeSectionAvatar(Long userId, Long sectionId, String avatar);
+
+    Result addSubSection(AddSubSectionDTO addSubSectionDTO);
+
+    Result changeSectionIntro(Long userId, Long sectionId, String sectionIntro);
 }

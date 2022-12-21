@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AddSubSectionDTO {
     private Long sectionId;
-    private String name;
+    private String[] subsections;
 }
