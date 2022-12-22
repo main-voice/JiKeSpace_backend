@@ -124,7 +124,8 @@ public class SectionServiceImpl implements SectionService {
         List<CollectAndSection> collectAndSections = collectAndSectionMapper.selectList(queryWrapper);
 
         if(collectAndSections.size()==0){
-            return Result.fail(-1,"该用户没有收藏的版块",null);
+            List<CollectSectionVO> collectSectionVOS = new ArrayList<>();
+            return Result.fail(20000,"okk",collectSectionVOS);
         }
 
         List<Long> sectionIdList = new ArrayList<>();
