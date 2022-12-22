@@ -83,7 +83,8 @@ public class TransactionController {
         if (!checkStudent(token)) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "用户尚未学生认证", null);
         }
-        return transactionService.getTransactionInfoById(id);
+        Long sid = Long.parseLong(JwtUtil.getUserIdFromToken(token));
+        return transactionService.getTransactionInfoById(sid, id);
     }
 
     @PostMapping("publish")

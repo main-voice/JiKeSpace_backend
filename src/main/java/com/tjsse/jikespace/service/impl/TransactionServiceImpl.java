@@ -134,7 +134,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Result getTransactionInfoById(Long id) {
+    public Result getTransactionInfoById(Long sid, Long id) {
         QueryWrapper<TransactionPost> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", id);
         TransactionPost transactionPost = transactionMapper.selectOne(queryWrapper);
@@ -195,6 +195,16 @@ public class TransactionServiceImpl implements TransactionService {
 //        updateWrapperTranPostViewCount.eq("id", transactionPost.getId())
 //                .set("view_counts", viewCount);
 //        transactionMapper.update(null, updateWrapperTranPostViewCount);
+        // isCollected
+        QueryWrapper<CollectAndTransaction> queryCollect = new QueryWrapper<>();
+        queryCollect.eq("user_id", sid)
+                .eq("transaction_post_id", transactionPost.getId());
+        CollectAndTransaction collectAndTransaction = collectAndTransactionMapper.selectOne(queryCollect);
+        if (collectAndTransaction == null) {
+            transactionVO.setIsCollected(false);
+        } else {
+            transactionVO.setIsCollected(true);
+        }
         return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionVO);
     }
 
@@ -330,7 +340,7 @@ public class TransactionServiceImpl implements TransactionService {
         Page<TransactionPost> transactionPostPage = transactionMapper.selectPage(emptyPage, queryWrapper);
 
         if (transactionPostPage.getRecords().size() == 0) {
-            return Result.fail(OTHER_ERROR.getCode(), "交易贴为空或者查询出错", null);
+            return Result.success(SUCCESS.getCode(), "交易贴为空", null);
         }
 
         // 查询后转为VO返回给前端
@@ -365,7 +375,7 @@ public class TransactionServiceImpl implements TransactionService {
         Page<TransactionPost> transactionPostPage = transactionMapper.selectPage(emptyPage, queryWrapper);
 
         if (transactionPostPage.getRecords().size() == 0) {
-            return Result.fail(OTHER_ERROR.getCode(), "交易贴为空或者查询出错", null);
+            return Result.success(SUCCESS.getCode(), "交易贴为空", null);
         }
 
         // 查询后转为VO返回给前端

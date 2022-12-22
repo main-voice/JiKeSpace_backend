@@ -40,4 +40,6 @@ public class TransactionVO {
 
     private String tagName;
     private String subtagName;
+
+    private Boolean isCollected;
 }

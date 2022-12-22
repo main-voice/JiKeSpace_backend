@@ -16,7 +16,8 @@ public interface TransactionService {
 
     Result getTransactionInfoByPage(SearchTransactionDTO searchTransactionDTO);
 
-    Result getTransactionInfoById(Long id);
+    Result getTransactionInfoById(
+            Long sid, Long id);
     Result createTransactionPost(Long authorId, NewTransactionDTO newTransactionDTO);
 
     Result deleteTransactionPost(Long id);
