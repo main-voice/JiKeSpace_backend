@@ -35,12 +35,12 @@ public class SectionController {
 
     @GetMapping("get_section_data")
     public Result getSectionData(@RequestHeader(value = "JK-Token", required = false) String jk_token,Integer sectionId,Integer curPage,Integer limit){
+        SectionDataDTO sectionDataDTO = new SectionDataDTO((long)sectionId,curPage,limit);
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
-            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+            return sectionService.getSectionData(null,sectionDataDTO);
         }
         Long userId = Long.valueOf(userIdStr);
-        SectionDataDTO sectionDataDTO = new SectionDataDTO((long)sectionId,curPage,limit);
         return sectionService.getSectionData(userId,sectionDataDTO);
     }
 

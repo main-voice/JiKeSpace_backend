@@ -37,4 +37,9 @@ public class TransactionVO {
     private Integer viewCounts;
 
     private String type;
+
+    private String tagName;
+    private String subtagName;
+
+    private Boolean isCollected;
 }

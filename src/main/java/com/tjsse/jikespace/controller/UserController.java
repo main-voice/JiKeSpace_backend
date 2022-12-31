@@ -199,14 +199,14 @@ public class UserController {
 
     @PostMapping("account/apply_to_student")
     public Result applyToStudent(@RequestHeader("JK-Token") String jk_token,@RequestParam("cardPicture") MultipartFile avatar
-    ,@RequestParam("studentId") Integer studentId){
+    ,@RequestParam("studentId") String studentId){
         String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
         if (userIdStr == null) {
             return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
         }
         Long userId = Long.valueOf(userIdStr);
         String s = ossService.uploadFile(avatar);
-        return studentService.applyToStudent(userId,s,studentId);
+        return studentService.applyToStudent(userId,s, Integer.valueOf(studentId));
     }
 
     @GetMapping("account/get_my_post")
@@ -357,6 +357,26 @@ public class UserController {
         }
         Long userId = Long.valueOf(userIdStr);
         return transactionService.getUserSeekTrans(userId, offset, limit);
+    }
+
+    @GetMapping("account/get_my_collect_transaction")
+    public Result getMyCollectTransaction(@RequestHeader(value = "JK-Token") String jk_token,
+                                          Integer offset, Integer limit) {
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        return transactionService.getMyCollectTransaction(userId, offset, limit);
+    }
+    @PostMapping("account/change_section_intro")
+    public Result changeSectionIntro(@RequestHeader(value = "JK-Token") String jk_token,@RequestBody ChangeIntroDTO changeIntroDTO){
+        String userIdStr = JwtUtil.getUserIdFromToken(jk_token);
+        if (userIdStr == null) {
+            return Result.fail(JKCode.OTHER_ERROR.getCode(), "从token中解析到到userId为空", null);
+        }
+        Long userId = Long.valueOf(userIdStr);
+        return sectionService.changeSectionIntro(userId,changeIntroDTO);
     }
 }
 

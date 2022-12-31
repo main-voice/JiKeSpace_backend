@@ -91,7 +91,13 @@ public class PostServiceImpl implements PostService {
         PostVO postVO = new PostVO();
 
         postVO.setTitle(post.getTitle());
-        postVO.setIsCollected(collectService.isUserCollectPost(userId,postId));
+        if(userId!=null){
+            postVO.setIsCollected(collectService.isUserCollectPost(userId,postId));
+        }
+        else{
+            postVO.setIsCollected(false);
+        }
+
         postVO.setSectionId(post.getSectionId());
 
         Section section = sectionService.findSectionById(post.getSectionId());
@@ -99,7 +105,8 @@ public class PostServiceImpl implements PostService {
         postVO.setTime(post.getUpdateTime());
         postVO.setContent(this.findBodyByPostId(postId));
 
-        User user = userService.findUserById(userId);
+        Post post1 = this.findPostById(postId);
+        User user = userService.findUserById(post1.getAuthorId());
         postVO.setAuthor(user.getUsername());
         postVO.setAvatar(user.getAvatar());
         postVO.setBrowseNumber(post.getViewCounts());
@@ -181,7 +188,8 @@ public class PostServiceImpl implements PostService {
         queryWrapper.in(Post::getId,postIds);
         queryWrapper.eq(Post::getIsDeleted,false);
         Page<Post> postPage1 = postMapper.selectPage(postPage, queryWrapper);
-        return copyListFolder(postPage1.getRecords());
+        List<Post> records = postPage1.getRecords();
+        return copyListFolder(records);
     }
 
     @Override

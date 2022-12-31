@@ -40,7 +40,7 @@ public class TransactionServiceImpl implements TransactionService {
     private SubtagMapper subtagMapper;
 
     @Autowired
-    private PostAndBodyMapper postAndBodyMapper;
+    private TransactionAndBodyMapper transactionAndBodyMapper;
 
     @Autowired
     private TransactionMapper transactionMapper;
@@ -101,33 +101,24 @@ public class TransactionServiceImpl implements TransactionService {
         } else if (Objects.equals(type, "sell")){
             intType = SELL_POST.getCode();
         }
+//        System.out.println(intType);
 
-        if (searchTransactionDTO.getCampusZone() != null) {
-            queryWrapper.eq("campus", searchTransactionDTO.getCampusZone());
-        }
-        if (searchTransactionDTO.getSearchContent() != null) {
-            queryWrapper.like("title", searchTransactionDTO.getSearchContent())
-                    .or()
-                    .like("summary", searchTransactionDTO.getSearchContent());
-        }
-        if (searchTransactionDTO.getType() != null) {
-            queryWrapper.eq("post_type", intType);
-        }
-        if (searchTransactionDTO.getTagId() != null) {
-            queryWrapper.eq("tag_id", searchTransactionDTO.getTagId());
-        }
-        if (searchTransactionDTO.getSubtagId() != null) {
-            queryWrapper.eq("subtag_id", searchTransactionDTO.getSubtagId());
-        }
-        queryWrapper.eq("is_deleted", false);
+        System.out.println(searchTransactionDTO.getCampusZone());
+        queryWrapper.eq(searchTransactionDTO.getType() != null, "post_type", intType)
+                .like(searchTransactionDTO.getCampusZone() != null, "campus", searchTransactionDTO.getCampusZone())
+                .like(searchTransactionDTO.getSearchContent() != null, "title", searchTransactionDTO.getSearchContent())
+                .eq(searchTransactionDTO.getTagId() != null, "tag_id", searchTransactionDTO.getTagId())
+                .eq(searchTransactionDTO.getSubtagId() != null, "subtag_id", searchTransactionDTO.getSubtagId())
+                .eq("is_deleted", false);
+
+        TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
+        List<TransactionPost> list = transactionMapper.selectList(queryWrapper);
+        transactionPagesVO.setTotal(list.size());
 
         // 分页查询
         Page<TransactionPost> emptyPage = new Page<>(searchTransactionDTO.getOffset(), searchTransactionDTO.getLimit());
         Page<TransactionPost> transactionPostPage = transactionMapper.selectPage(emptyPage, queryWrapper);
 
-        if (transactionPostPage.getRecords().size() == 0) {
-            return Result.fail(OTHER_ERROR.getCode(), "交易贴为空或者查询出错", null);
-        }
 
         // 查询后转为VO返回给前端
         List<TransactionPageVO> transactionPageVOList = new ArrayList<>();
@@ -138,22 +129,28 @@ public class TransactionServiceImpl implements TransactionService {
             transactionPageVOList.add(transactionPageVO);
         }
 
-        TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
-        transactionPagesVO.setTotal(transactionPageVOList.size());
         transactionPagesVO.setTransactionPageVOList(transactionPageVOList);
         return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionPagesVO);
     }
 
     @Override
-    public Result getTransactionInfoById(Long id) {
-        TransactionPost transactionPost = transactionMapper.selectById(id);
+    public Result getTransactionInfoById(Long sid, Long id) {
+        QueryWrapper<TransactionPost> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", id);
+        TransactionPost transactionPost = transactionMapper.selectOne(queryWrapper);
         if (transactionPost == null || transactionPost.isDeleted()) {
             return Result.fail(OTHER_ERROR.getCode(), "该id不存在或已删除", null);
         }
 
         TransactionVO transactionVO = new TransactionVO();
         BeanUtils.copyProperties(transactionPost, transactionVO);
+        Integer tagId = transactionPost.getTagId();
+        Tag tag = tagMapper.selectById(tagId);
+        transactionVO.setTagName(tag.getTagName());
 
+        Integer subtagId = transactionPost.getSubtagId();
+        Subtag subtag = subtagMapper.selectById(subtagId);
+        transactionVO.setSubtagName(subtag.getSubtagName());
         // type
         if (Objects.equals(transactionPost.getPostType(), SELL_POST.getCode())) {
             transactionVO.setType("出售");
@@ -169,9 +166,14 @@ public class TransactionServiceImpl implements TransactionService {
         transactionVO.setAvatar(user.getAvatar());
         transactionVO.setAuthorName(user.getUsername());
         // content
-        QueryWrapper<PostAndBody> postAndBodyQueryWrapper = new QueryWrapper<>();
-        postAndBodyQueryWrapper.eq("post_id", transactionPost.getId());
-        String content = postAndBodyMapper.selectOne(postAndBodyQueryWrapper).getContent();
+        QueryWrapper<TransactionAndBody> postAndBodyQueryWrapper = new QueryWrapper<>();
+        postAndBodyQueryWrapper.eq("transaction_id", transactionPost.getId());
+        // multi records are queried.
+        TransactionAndBody transactionAndBody = transactionAndBodyMapper.selectOne(postAndBodyQueryWrapper);
+        if (transactionAndBody == null) {
+            return Result.fail(OTHER_ERROR.getCode(), "获取交易贴内容时失败，为空", null);
+        }
+        String content = transactionAndBody.getContent();
         transactionVO.setContent(content);
         // images
         QueryWrapper<TransactionImages> transactionImagesQueryWrapper = new QueryWrapper<>();
@@ -193,6 +195,16 @@ public class TransactionServiceImpl implements TransactionService {
 //        updateWrapperTranPostViewCount.eq("id", transactionPost.getId())
 //                .set("view_counts", viewCount);
 //        transactionMapper.update(null, updateWrapperTranPostViewCount);
+        // isCollected
+        QueryWrapper<CollectAndTransaction> queryCollect = new QueryWrapper<>();
+        queryCollect.eq("user_id", sid)
+                .eq("transaction_post_id", transactionPost.getId());
+        CollectAndTransaction collectAndTransaction = collectAndTransactionMapper.selectOne(queryCollect);
+        if (collectAndTransaction == null) {
+            transactionVO.setIsCollected(false);
+        } else {
+            transactionVO.setIsCollected(true);
+        }
         return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionVO);
     }
 
@@ -205,6 +217,7 @@ public class TransactionServiceImpl implements TransactionService {
         transactionPost.setPublishTime(LocalDateTime.now());
         transactionPost.setAuthorId(authorId);
         transactionPost.setViewCounts(0);
+        transactionPost.setSummary(newTransactionDTO.getContent());
 
         if (Objects.equals(newTransactionDTO.getType(), "seek")) {
             transactionPost.setPostType(BUY_POST.getCode());
@@ -252,11 +265,12 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         // 有了postId，根据postId去设置对应的body，再回来一个bodyId
-        PostAndBody postAndBody = PostAndBody.builder()
-                .postId(transactionPost.getId())
+        TransactionAndBody transactionAndBody = TransactionAndBody.builder()
+                .transactionId(transactionPost.getId())
                 .content(newTransactionDTO.getContent())
                 .build();
-        int insertBody = postAndBodyMapper.insert(postAndBody);
+
+        int insertBody = transactionAndBodyMapper.insert(transactionAndBody);
         if (insertBody == 0) {
             return Result.fail(OTHER_ERROR.getCode(), "插入交易帖内容失败", null);
         }
@@ -265,7 +279,7 @@ public class TransactionServiceImpl implements TransactionService {
         // 同时更新封面图
         UpdateWrapper<TransactionPost> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", transactionPost.getId())
-                        .set("body_id", postAndBody.getId());
+                        .set("body_id", transactionAndBody.getId());
         if (imagesUrl.size() >= 1) {
             updateWrapper.set("cover_image", imagesUrl.get(0));
         }
@@ -312,17 +326,21 @@ public class TransactionServiceImpl implements TransactionService {
     public Result getUserSellTrans(Long userId, Integer offset, Integer limit) {
         QueryWrapper<TransactionPost> queryWrapper = new QueryWrapper<>();
         Integer intType = SELL_POST.getCode();
+        TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
 
         queryWrapper.eq("post_type", intType)
                 .eq("is_deleted", false)
                 .eq("author_id", userId);
+
+        List<TransactionPost> list = transactionMapper.selectList(queryWrapper);
+        transactionPagesVO.setTotal(list.size());
 
         // 分页查询
         Page<TransactionPost> emptyPage = new Page<>(offset, limit);
         Page<TransactionPost> transactionPostPage = transactionMapper.selectPage(emptyPage, queryWrapper);
 
         if (transactionPostPage.getRecords().size() == 0) {
-            return Result.fail(OTHER_ERROR.getCode(), "交易贴为空或者查询出错", null);
+            return Result.success(SUCCESS.getCode(), "交易贴为空", null);
         }
 
         // 查询后转为VO返回给前端
@@ -334,8 +352,6 @@ public class TransactionServiceImpl implements TransactionService {
             transactionPageVOList.add(transactionPageVO);
         }
 
-        TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
-        transactionPagesVO.setTotal(transactionPageVOList.size());
         transactionPagesVO.setTransactionPageVOList(transactionPageVOList);
         return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionPagesVO);
     }
@@ -344,17 +360,22 @@ public class TransactionServiceImpl implements TransactionService {
     public Result getUserSeekTrans(Long userId, Integer offset, Integer limit) {
         QueryWrapper<TransactionPost> queryWrapper = new QueryWrapper<>();
         Integer intType = BUY_POST.getCode();
+        TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
+
 
         queryWrapper.eq("post_type", intType)
                 .eq("is_deleted", false)
                 .eq("author_id", userId);
+
+        List<TransactionPost> list = transactionMapper.selectList(queryWrapper);
+        transactionPagesVO.setTotal(list.size());
 
         // 分页查询
         Page<TransactionPost> emptyPage = new Page<>(offset, limit);
         Page<TransactionPost> transactionPostPage = transactionMapper.selectPage(emptyPage, queryWrapper);
 
         if (transactionPostPage.getRecords().size() == 0) {
-            return Result.fail(OTHER_ERROR.getCode(), "交易贴为空或者查询出错", null);
+            return Result.success(SUCCESS.getCode(), "交易贴为空", null);
         }
 
         // 查询后转为VO返回给前端
@@ -366,8 +387,28 @@ public class TransactionServiceImpl implements TransactionService {
             transactionPageVOList.add(transactionPageVO);
         }
 
+        transactionPagesVO.setTransactionPageVOList(transactionPageVOList);
+        return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionPagesVO);
+    }
+
+    @Override
+    public Result getMyCollectTransaction(Long userId, Integer offset, Integer limit) {
+        QueryWrapper<CollectAndTransaction> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        List<CollectAndTransaction> originList = collectAndTransactionMapper.selectList(queryWrapper);
+        // new obj
         TransactionPagesVO transactionPagesVO = new TransactionPagesVO();
-        transactionPagesVO.setTotal(transactionPageVOList.size());
+        transactionPagesVO.setTotal(originList.size());
+
+        List<TransactionPageVO> transactionPageVOList = new ArrayList<>();
+        for (CollectAndTransaction entity
+                : originList) {
+            Long tranId = entity.getTransactionPostId();
+            TransactionPost post = transactionMapper.selectById(tranId);
+            TransactionPageVO transactionPageVO = new TransactionPageVO();
+            BeanUtils.copyProperties(post, transactionPageVO);
+            transactionPageVOList.add(transactionPageVO);
+        }
         transactionPagesVO.setTransactionPageVOList(transactionPageVOList);
         return Result.success(SUCCESS.getCode(), SUCCESS.getMsg(), transactionPagesVO);
     }

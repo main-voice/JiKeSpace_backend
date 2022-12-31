@@ -55,16 +55,6 @@ public class CommentServiceImpl implements CommentService {
         Page<Comment> commentPage1 = commentMapper.selectPage(commentPage,queryWrapper);
         List<Comment> records = commentPage1.getRecords();
         List<CommentVO> commentVOList = this.copyList(records,userId);
-/*        for (CommentVO commentVO :
-                commentVOList) {
-            String userName = userService.findUserById(userId).getUsername();
-            if(commentVO.getAuthor()==null||userName == null){
-                commentVO.setAbleToDelete(false);
-            }
-            else{
-                commentVO.setAbleToDelete(commentVO.getAuthor() == userName);
-            }
-        }*/
         return commentVOList;
     }
 
@@ -123,6 +113,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<MyReplyVO> findCommentsByUserId(Long userId) {
         List<Long> postIds = postService.findPostIdsByUserId(userId);
+        if(postIds.size()==0){
+            List<MyReplyVO> myReplyVOList = new ArrayList<>();
+            return myReplyVOList;
+        }
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Comment::getIsDeleted,false);
         queryWrapper.in(Comment::getPostId,postIds);

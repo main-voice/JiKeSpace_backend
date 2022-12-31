@@ -16,7 +16,8 @@ public interface TransactionService {
 
     Result getTransactionInfoByPage(SearchTransactionDTO searchTransactionDTO);
 
-    Result getTransactionInfoById(Long id);
+    Result getTransactionInfoById(
+            Long sid, Long id);
     Result createTransactionPost(Long authorId, NewTransactionDTO newTransactionDTO);
 
     Result deleteTransactionPost(Long id);
@@ -26,4 +27,5 @@ public interface TransactionService {
     Result getUserSellTrans(Long userId, Integer offset, Integer limit);
     Result getUserSeekTrans(Long userId, Integer offset, Integer limit);
 
+    Result getMyCollectTransaction(Long userId, Integer offset, Integer limit);
 }
